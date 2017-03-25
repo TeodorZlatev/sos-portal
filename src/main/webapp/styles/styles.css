@@ -1,0 +1,10 @@
+@CHARSET "UTF-8";
+
+body {
+	text-align: center;
+	text-size-adjust: 100%;
+}
+
+#hostsDiv {
+	display: none;
+}
