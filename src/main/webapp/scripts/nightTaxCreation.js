@@ -12,7 +12,7 @@ window.onload = function() {
 			option.value = rooms[i].id;
 			select.appendChild(option);
 		}
-	}, "GET", "/sos-portal/rooms");
+	}, "GET", "/sos-portal/rooms?blockId=" + 1);
 }
 
 function expandHosts() {
@@ -33,20 +33,20 @@ function expandHosts() {
 			dateFormat : 'dd-mm-yy'
 		});
 
-	}, "GET", "sos-portal/hosts/" + roomId + "/" + 1);
+	}, "GET", "/sos-portal/hosts?roomId=" + roomId + "&blockId=" + 1);
 }
 
 function createNightTax() {
 
 	var guest = document.getElementById("guest").value;
 	var rooms = document.getElementById("rooms");
-	var room = rooms.options[rooms.selectedIndex].value;
+	var roomId = rooms.options[rooms.selectedIndex].value;
 	var host = document.getElementById("hosts").value;
 	var date = document.getElementById("date").value;
 
 	var data = JSON.stringify({
 		"guestName" : guest,
-		"roomNumber" : room,
+		"roomId" : roomId,
 		"hostId" : host,
 		"date" : date
 	});
@@ -62,6 +62,6 @@ function createNightTax() {
 	createAjaxRequest(function() {
 		// editDivs();
 		// cleanFieldsInDiv("creationDiv");
-	}, "POST", "sos-portal/nightTax", data, requestHeader);
+	}, "POST", "/sos-portal/nightTax", data, requestHeader);
 
 }

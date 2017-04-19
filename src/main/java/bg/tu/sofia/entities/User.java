@@ -12,7 +12,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-		@NamedQuery(name = "User.findAllByRoomIdAndBlockId", query = "SELECT u FROM UserRoom ur JOIN ur.room r JOIN ur.user u WHERE r.id = (:roomId) AND r.block.id = (:blockId)") })
+		@NamedQuery(name = "User.findAllByRoomIdAndBlockId", query = "SELECT u FROM UserRoom ur JOIN ur.room r JOIN ur.user u WHERE r.id = :roomId AND r.block.id = :blockId"),
+		@NamedQuery(name = "User.getPageOfPeopleWithTaxesByBlockId", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r WHERE r.block.id = :blockId") })
 
 @Entity
 @Table(name = "user")
@@ -27,6 +28,8 @@ public class User {
 	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private Role role;
+	@Column(name = "activated")
+	private boolean isActivated;
 
 	public int getId() {
 		return id;
@@ -58,6 +61,14 @@ public class User {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	public boolean isActivated() {
+		return isActivated;
+	}
+
+	public void setActivated(boolean isActivated) {
+		this.isActivated = isActivated;
 	}
 
 }

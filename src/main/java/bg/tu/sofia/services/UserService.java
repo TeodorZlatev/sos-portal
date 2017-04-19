@@ -9,8 +9,12 @@ import bg.tu.sofia.dtos.UserDto;
 @Component
 public interface UserService {
 
-	List<UserDto> getAllByRoomIdAndBlockId(int roomId, int blockId);
+	public List<UserDto> getAllByRoomIdAndBlockId(int roomId, int blockId);
 
-	void insertInhabitant(UserDto user);
+	public void insertInhabitant(UserDto user);
+	
+	public List<UserDto> getPeopleWithNightTaxes(int blockId, int pageNumber);
+	
+	public String getCountPeopleWithNightTaxes(int blockId, int pageNumber);
 
 }

@@ -4,13 +4,22 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import bg.tu.sofia.constants.NightTaxStatusEnum;
+
+@NamedQueries({
+		@NamedQuery(name = "NightTax.findByUserIdAndStatus", query = "SELECT nt FROM NightTax nt WHERE nt.host.id = :userId AND nt.status = :status") })
 
 @Entity
 @Table(name = "night_tax")
@@ -21,7 +30,7 @@ public class NightTax {
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User host;
-	@Column (name = "guest_name")
+	@Column(name = "guest_name")
 	private String guestName;
 	@ManyToOne
 	@JoinColumn(name = "room_id")
@@ -36,7 +45,8 @@ public class NightTax {
 	@Column(name = "date_paid")
 	private Date datePaid;
 	@Column(name = "status")
-	private String status;
+	@Enumerated(EnumType.STRING)
+	private NightTaxStatusEnum status;
 
 	public int getId() {
 		return id;
@@ -102,11 +112,11 @@ public class NightTax {
 		this.datePaid = datePaid;
 	}
 
-	public String getStatus() {
+	public NightTaxStatusEnum getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(NightTaxStatusEnum status) {
 		this.status = status;
 	}
 
