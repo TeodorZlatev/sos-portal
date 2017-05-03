@@ -83,7 +83,7 @@ public class NightTaxServiceImpl implements NightTaxService {
 	@Override
 	public String getCountNightTaxes(int userId, NightTaxStatusEnum status, int pageNumber) {
 
-		PageRequest pageable = new PageRequest(0, 1);
+		PageRequest pageable = new PageRequest(0, PAGE_SIZE);
 
 		int pagesCount = nightTaxRepository.findByUserIdAndStatus(userId, status, pageable).getTotalPages();
 		

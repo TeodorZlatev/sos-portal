@@ -55,6 +55,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void insertInhabitant(UserDto userDto) {
+		//TODO: validation save user, but not userRoom
 		User user = userDto.toEntity();
 		
 		Role role = new Role();
@@ -91,7 +92,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String getCountPeopleWithNightTaxes(int blockId, int pageNumber) {
 
-		PageRequest pageable = new PageRequest(0, 1);
+		PageRequest pageable = new PageRequest(0, PAGE_SIZE);
 
 		int pagesCount = userRepository.getPageOfPeopleWithTaxesByBlockId(blockId, pageable).getTotalPages();
 		
