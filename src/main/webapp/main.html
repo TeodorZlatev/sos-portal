@@ -9,25 +9,21 @@
 <meta charset="UTF-8">
 </head>
 <body>
-	<h1>Вход</h1>
-	<div id="messenger" style="display: none;">
+	<header>
+		<ul id="menu" class="menu">
+		</ul>
+	</header>
+	<div class="frame">
+		<div id="messenger" style="display: none;">
 			<span class="closebtn"
 				onclick="this.parentElement.style.display='none';">&times;</span>
 			<output id="message"></output>
 		</div>
-	<div>
-		<table class="center">
-			<tr>
-				<td><output>ЕГН:</output></td>
-				<td><input id="personalNumber"></input></td>
-			</tr>
-			<tr>
-				<td><output>Парола:</output></td>
-				<td><input id="password" type="password"></input></td>
-			</tr>
-		</table>
-		<button onclick="login(personalNumber.value, password.value)">Влизане</button>
+		<div id="mainDiv"></div>
 	</div>
-	<script src="scripts/login.js" defer></script>
+	<footer>
+		<div class="developer">Разработено от Теодор Златев</div>
+	</footer>
+	<script src="scripts/main.js" defer></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 package bg.tu.sofia.services.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,15 +19,35 @@ public class RoomServiceImpl implements RoomService {
 
 	@Override
 	public List<RoomDto> getAllByBlockId(int blockId) {
-		List<Room> rooms = roomRepository.findAllByBlockId(blockId);
-		List<RoomDto> roomsDto = new ArrayList<RoomDto>();
-		rooms.forEach(room -> roomsDto.add(RoomDto.fromEntity(room)));
-		return roomsDto;
+		List<Room> rooms = roomRepository.findAllByBlockIdOrderByNumberAsc(blockId);
+		
+		return rooms.stream().map(this::fromEntity).collect(Collectors.toList());
 	}
 
 	@Override
-	public RoomDto getByRoomAndBlockId(String roomNumber, int blockId) {
+	public RoomDto getByNumberAndBlockId(String roomNumber, int blockId) {
 		Room room = roomRepository.findByNumberAndBlockId(roomNumber, blockId);
-		return RoomDto.fromEntity(room);
+		
+		return this.fromEntity(room);
+	}
+	
+	private Room toEntity(RoomDto roomDto) {
+		Room room = new Room();
+		
+		room.setId(roomDto.getId());
+		room.setNumber(roomDto.getNumber());
+		// TODO: blockId
+		
+		return room;
+	}
+
+	private RoomDto fromEntity(Room room) {
+		RoomDto roomDto = new RoomDto();
+		
+		roomDto.setId(room.getId());
+		roomDto.setNumber(room.getNumber());
+		roomDto.setBlockId(room.getBlock().getId());
+		
+		return roomDto;
 	}
 }

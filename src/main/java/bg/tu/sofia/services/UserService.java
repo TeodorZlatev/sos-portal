@@ -15,6 +15,12 @@ public interface UserService {
 	
 	public List<UserDto> getPeopleWithNightTaxes(int blockId, int pageNumber);
 	
+	public List<UserDto> getPeopleWithNightTaxesByMarker(String marker, int blockId, int pageNumber);
+	
 	public String getCountPeopleWithNightTaxes(int blockId, int pageNumber);
+	
+	public Integer authenticateUser(String personalNumber, String password) throws Exception;
+
+	public void insertToken(int userId, String token);
 
 }

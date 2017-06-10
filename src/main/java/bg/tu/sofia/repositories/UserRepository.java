@@ -9,12 +9,17 @@ import org.springframework.data.repository.query.Param;
 
 import bg.tu.sofia.entities.User;
 
-public interface UserRepository extends PagingAndSortingRepository<User, Integer>{
+public interface UserRepository extends PagingAndSortingRepository<User, Integer> {
 
-	//Query - bg.tu.sofia.entities.User
+	// Query - bg.tu.sofia.entities.User
 	public List<User> findAllByRoomIdAndBlockId(@Param("roomId") int roomId, @Param("blockId") int blockId);
-	
-	//Query - bg.tu.sofia.entities.User
+
+	// Query - bg.tu.sofia.entities.User
 	public Page<User> getPageOfPeopleWithTaxesByBlockId(@Param("blockId") int blockId, Pageable pageable);
-	
+
+	// Query - bg.tu.sofia.entities.User
+	public Page<User> getPageOfPeopleWithTaxesByBlockIdAndMarker(@Param("marker") String marker, @Param("blockId") int blockId, Pageable pageable);
+
+	public User findByPersonalNumber(String personalNumber);
+
 }

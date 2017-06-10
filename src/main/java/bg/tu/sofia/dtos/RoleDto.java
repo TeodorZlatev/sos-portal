@@ -1,7 +1,5 @@
 package bg.tu.sofia.dtos;
 
-import bg.tu.sofia.entities.Role;
-
 public class RoleDto {
 	private int id;
 	private String name;
@@ -18,17 +16,4 @@ public class RoleDto {
 		this.name = name;
 	}
 	
-	public static RoleDto fromEntity(Role role){
-		RoleDto roleDto = new RoleDto();
-		roleDto.setId(role.getId());
-		roleDto.setName(role.getName());
-		return roleDto;
-	}
-	
-	public Role toEntity(){
-		Role role = new Role();
-		role.setId(this.getId());
-		role.setName(this.getName());
-		return role;
-	}
 }

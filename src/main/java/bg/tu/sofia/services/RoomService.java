@@ -7,5 +7,5 @@ import bg.tu.sofia.dtos.RoomDto;
 public interface RoomService {
 	public List<RoomDto> getAllByBlockId(int blockId);
 
-	public RoomDto getByRoomAndBlockId(String room, int blockId);
+	public RoomDto getByNumberAndBlockId(String roomNumber, int blockId);
 }

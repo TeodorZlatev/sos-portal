@@ -8,7 +8,7 @@ import bg.tu.sofia.entities.Room;
 
 public interface RoomRepository extends PagingAndSortingRepository<Room, Integer>{
 
-	public List<Room> findAllByBlockId(int blockId);
+	public List<Room> findAllByBlockIdOrderByNumberAsc(int blockId);
 
 	public Room findByNumberAndBlockId(String roomNumber, int blockId);
 }

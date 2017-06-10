@@ -6,8 +6,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+@NamedQueries({
+		@NamedQuery(name = "Credentials.findByUserIdAndPassword", query = "SELECT cr FROM Credentials cr WHERE cr.user.id = :userId AND cr.password = :password") })
 
 @Entity
 @Table(name = "credentials")

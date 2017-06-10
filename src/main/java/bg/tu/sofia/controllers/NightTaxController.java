@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import bg.tu.sofia.constants.NightTaxStatusEnum;
 import bg.tu.sofia.dtos.NightTaxDto;
 import bg.tu.sofia.services.NightTaxService;
+import bg.tu.sofia.utils.StructuredResponse;
 
 @RestController
 public class NightTaxController {
@@ -23,9 +24,10 @@ public class NightTaxController {
 	@RequestMapping(
 			method = RequestMethod.POST, 
 			value = "/nightTax", 
-			consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void createNightTax(@RequestBody NightTaxDto nightTax) {
-		nightTaxService.createNightTax(nightTax);
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public StructuredResponse createNightTax(@RequestBody NightTaxDto nightTax) {
+		return nightTaxService.createNightTax(nightTax);
 	}
 	
 	@RequestMapping(
@@ -47,4 +49,5 @@ public class NightTaxController {
 			@RequestParam(name = "pageNumber") int pageNumber) {
 		return nightTaxService.getCountNightTaxes(userId, status, pageNumber);
 	}
+	
 }

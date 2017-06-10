@@ -13,7 +13,8 @@ import javax.persistence.Table;
 
 @NamedQueries({
 		@NamedQuery(name = "User.findAllByRoomIdAndBlockId", query = "SELECT u FROM UserRoom ur JOIN ur.room r JOIN ur.user u WHERE r.id = :roomId AND r.block.id = :blockId"),
-		@NamedQuery(name = "User.getPageOfPeopleWithTaxesByBlockId", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r WHERE r.block.id = :blockId") })
+		@NamedQuery(name = "User.getPageOfPeopleWithTaxesByBlockId", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r WHERE r.block.id = :blockId ORDER BY u.username"),
+		@NamedQuery(name = "User.getPageOfPeopleWithTaxesByBlockIdAndMarker", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r WHERE r.block.id = :blockId AND u.username LIKE :marker ORDER BY u.username") })
 
 @Entity
 @Table(name = "user")
@@ -25,6 +26,8 @@ public class User {
 	private String username;
 	@Column(name = "personal_number")
 	private String personalNumber;
+	@Column(name = "email")
+	private String email;
 	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private Role role;
@@ -53,6 +56,14 @@ public class User {
 
 	public void setPersonalNumber(String personalNumber) {
 		this.personalNumber = personalNumber;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public Role getRole() {

@@ -1,22 +1,26 @@
 package bg.tu.sofia.services.impl;
 
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import bg.tu.sofia.constants.RoleEnum;
 import bg.tu.sofia.dtos.RoomDto;
 import bg.tu.sofia.dtos.UserDto;
 import bg.tu.sofia.dtos.UserRoomDto;
+import bg.tu.sofia.entities.Credentials;
 import bg.tu.sofia.entities.Role;
+import bg.tu.sofia.entities.Token;
 import bg.tu.sofia.entities.User;
+import bg.tu.sofia.repositories.CredentialsRepository;
+import bg.tu.sofia.repositories.TokenRepository;
 import bg.tu.sofia.repositories.UserRepository;
-import bg.tu.sofia.services.RoleService;
 import bg.tu.sofia.services.RoomService;
 import bg.tu.sofia.services.UserRoomService;
 import bg.tu.sofia.services.UserService;
@@ -25,10 +29,16 @@ import bg.tu.sofia.utils.PageUtil;
 @Component
 public class UserServiceImpl implements UserService {
 	
-	private static final int PAGE_SIZE = 1;
+	private static final int PAGE_SIZE = 10;
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private CredentialsRepository credentialsRepository;
+	
+	@Autowired
+	private TokenRepository tokenRepository;
 
 	@Autowired
 	private UserRoomService userRoomService;
@@ -37,56 +47,49 @@ public class UserServiceImpl implements UserService {
 	private RoomService roomService;
 	
 	@Autowired
-	private RoleService roleService;
-	
-	@Autowired
 	private PageUtil pageUtil;
 
 	@Override
 	public List<UserDto> getAllByRoomIdAndBlockId(int roomId, int blockId) {
 		List<User> users = userRepository.findAllByRoomIdAndBlockId(roomId, blockId);
-		List<UserDto> usersDto = new ArrayList<>();
-		users.forEach(user -> {
-			UserDto userDto = UserDto.fromEntity(user);
-			usersDto.add(userDto);
-		});
-		return usersDto;
+
+		return users.stream().map(this::fromEntity).collect(Collectors.toList());
 	}
 
 	@Override
 	public void insertInhabitant(UserDto userDto) {
 		//TODO: validation save user, but not userRoom
-		User user = userDto.toEntity();
-		
-		Role role = new Role();
-		role.setId(RoleEnum.INHABITED.getId());
-		user.setRole(role);
+		User user = this.toEntity(userDto);
 		
 		userRepository.save(user);
 		
-		RoomDto roomDto = roomService.getByRoomAndBlockId(userDto.getRoom(), 1);
+		RoomDto roomDto = roomService.getByNumberAndBlockId(userDto.getRoom(), 1);
 		
 		UserRoomDto userRoomDto = new UserRoomDto();
 		userRoomDto.setUserId(user.getId());
 		userRoomDto.setRoomId(roomDto.getId());
+		
 		userRoomService.insertUserRoom(userRoomDto);
 	}
 
 	@Override
 	public List<UserDto> getPeopleWithNightTaxes(int blockId, int pageNumber) {
 
-		PageRequest pageable = new PageRequest(pageNumber - 1, PAGE_SIZE, Sort.Direction.ASC, "username");
+		PageRequest pageable = new PageRequest(pageNumber - 1, PAGE_SIZE);
 
 		Page<User> users = userRepository.getPageOfPeopleWithTaxesByBlockId(blockId, pageable);
-		List<UserDto> usersDto = new ArrayList<>();
+		
+		return users.getContent().stream().map(this::fromEntity).collect(Collectors.toList());
 
-		users.forEach(user -> {
-			UserDto userDto = UserDto.fromEntity(user);
-
-			usersDto.add(userDto);
-		});
-
-		return usersDto;
+	}
+	
+	@Override
+	public List<UserDto> getPeopleWithNightTaxesByMarker(String marker, int blockId, int pageNumber) {
+		PageRequest pageable = new PageRequest(pageNumber - 1, PAGE_SIZE);
+		
+		Page<User> users = userRepository.getPageOfPeopleWithTaxesByBlockIdAndMarker("%" + marker + "%", blockId, pageable);
+		
+		return users.getContent().stream().map(this::fromEntity).collect(Collectors.toList());
 	}
 	
 	@Override
@@ -96,7 +99,66 @@ public class UserServiceImpl implements UserService {
 
 		int pagesCount = userRepository.getPageOfPeopleWithTaxesByBlockId(blockId, pageable).getTotalPages();
 		
-		String page = pageUtil.createPagination(pageNumber, pagesCount);
-		return page;
+		return pageUtil.createPagination(pageNumber, pagesCount);
 	}
+	
+	public Integer authenticateUser(String personalNumber, String password) throws Exception  {
+		User user = this.userRepository.findByPersonalNumber(personalNumber);
+		
+		if (user == null) {
+			throw new Exception("user");
+		}
+		
+		Credentials credentials = this.credentialsRepository.findByUserIdAndPassword(user.getId(), password);
+		
+		if (credentials == null) {
+			throw new Exception("password");
+		}
+		
+		return user.getId();
+	}
+
+	public void insertToken(int userId, String token) {
+		Token mainToken = new Token();
+		
+		mainToken.setToken(token);
+		mainToken.setUserId(userId);
+		
+		Date date = new Date();
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DATE, 1);
+		date = c.getTime();
+		
+		mainToken.setExpirationDate(date);
+		
+		this.tokenRepository.save(mainToken);
+	}
+	
+	private User toEntity(UserDto userDto) {
+		User user = new User();
+		
+		user.setId(userDto.getId());
+		user.setUsername(userDto.getUsername());
+		user.setPersonalNumber(userDto.getPersonalNumber());
+
+		Role role = new Role();
+		role.setId(RoleEnum.INHABITED.getId());
+		user.setRole(role);
+		
+		return user;
+	}
+
+	private UserDto fromEntity(User user) {
+		UserDto userDto = new UserDto();
+		
+		userDto.setId(user.getId());
+		userDto.setUsername(user.getUsername());
+		userDto.setPersonalNumber(user.getPersonalNumber());
+		userDto.setEmail(user.getEmail());
+		userDto.setRoleId(user.getRole().getId());
+		
+		return userDto;
+	}
+
 }

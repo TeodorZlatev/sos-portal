@@ -1,7 +1,5 @@
 package bg.tu.sofia.dtos;
 
-import bg.tu.sofia.entities.Room;
-
 public class RoomDto {
 	private int id;
 	private String number;
@@ -31,19 +29,4 @@ public class RoomDto {
 		this.blockId = blockId;
 	}
 
-	public Room toEntity() {
-		Room room = new Room();
-		room.setId(this.getId());
-		room.setNumber(this.getNumber());
-		// TODO: blockId
-		return room;
-	}
-
-	public static RoomDto fromEntity(Room room) {
-		RoomDto roomDto = new RoomDto();
-		roomDto.setId(room.getId());
-		roomDto.setNumber(room.getNumber());
-		roomDto.setBlockId(room.getBlock().getId());
-		return roomDto;
-	}
 }

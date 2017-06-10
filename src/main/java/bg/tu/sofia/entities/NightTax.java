@@ -19,7 +19,8 @@ import javax.persistence.Table;
 import bg.tu.sofia.constants.NightTaxStatusEnum;
 
 @NamedQueries({
-		@NamedQuery(name = "NightTax.findByUserIdAndStatus", query = "SELECT nt FROM NightTax nt WHERE nt.host.id = :userId AND nt.status = :status") })
+		@NamedQuery(name = "NightTax.findByUserIdAndStatus", query = "SELECT nt FROM NightTax nt WHERE nt.host.id = :userId AND nt.status = :status ORDER BY nt.dateCreated DESC"),
+		@NamedQuery(name = "NightTax.findByUserIdAndGuestNameAndDate", query = "SELECT nt FROM NightTax nt WHERE nt.host.id = :userId AND nt.guestName = :guestName AND nt.date = :date") })
 
 @Entity
 @Table(name = "night_tax")

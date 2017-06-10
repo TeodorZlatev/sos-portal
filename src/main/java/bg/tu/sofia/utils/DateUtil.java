@@ -11,17 +11,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class DateUtil {
 
-	Logger logger = Logger.getLogger(DateUtil.class.getName());
-
+	private Logger logger = Logger.getLogger(DateUtil.class.getName());
+	
+	private final String dateFormat = "dd-MM-yyyy";
+	private final String dateFormatWithTime = "HH:mm dd-MM-yyyy";
+	private final SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+	private final SimpleDateFormat sdfWithTime = new SimpleDateFormat(dateFormatWithTime);
+	
 	public Date convertFromStringToDate(String dateStr) {
-		SimpleDateFormat sm = new SimpleDateFormat("dd-MM-yyyy");
 		Date date = null;
 		try {
-			date = sm.parse(dateStr);
+			date = sdf.parse(dateStr);
 		} catch (ParseException e) {
 			logger.log(Level.SEVERE, "Parsing date failed!", e);
 		}
 		return date;
+	}
+
+	public String convertFromDateToString(Date date) {
+		return sdf.format(date);
+	}
+	
+	public String convertFromDateWithTimeToString(Date date) {
+		return sdfWithTime.format(date);
 	}
 
 }

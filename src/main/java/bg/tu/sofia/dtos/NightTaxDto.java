@@ -1,7 +1,6 @@
 package bg.tu.sofia.dtos;
 
 import bg.tu.sofia.constants.NightTaxStatusEnum;
-import bg.tu.sofia.entities.NightTax;
 
 public class NightTaxDto {
 	private String guestName;
@@ -93,36 +92,6 @@ public class NightTaxDto {
 
 	public void setDatePaid(String datePaid) {
 		this.datePaid = datePaid;
-	}
-
-	public NightTax toEntity() {
-		NightTax nightTax = new NightTax();
-
-		// room is converted in service
-
-		nightTax.setGuestName(this.getGuestName());
-
-		// host is converted in service
-		// date
-		// creator
-		// status
-		// dateCreated
-		
-		return nightTax;
-	}
-
-	public static NightTaxDto fromEntity(NightTax nightTax) {
-		NightTaxDto nightTaxDto = new NightTaxDto();
-
-		// roomNumber
-		nightTaxDto.setStatus(nightTax.getStatus());
-		nightTaxDto.setDate(nightTax.getDate().toString());
-		// hostName
-		nightTaxDto.setGuestName(nightTax.getGuestName());
-		// creatorName
-		nightTaxDto.setDateCreated(nightTax.getDateCreated().toString());
-
-		return nightTaxDto;
 	}
 
 }
