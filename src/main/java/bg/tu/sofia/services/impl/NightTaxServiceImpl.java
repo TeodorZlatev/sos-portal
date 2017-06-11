@@ -49,7 +49,28 @@ public class NightTaxServiceImpl implements NightTaxService {
 	@Override
 	public StructuredResponse createNightTax(NightTaxDto nightTaxDto) {
 
-		String message;
+		StringBuilder sb = new StringBuilder();
+
+		if (nightTaxDto.getGuestName() == null
+				|| !nightTaxDto.getGuestName().matches("[А-Яа-я]+[ ]*[А-Яа-я]*[ ]*[А-Яа-я]*")) {
+			sb.append("Невалидни имена! (пр. Иван Иванов Иванов)</br>");
+		}
+
+		if (nightTaxDto.getRoomId() == null || !nightTaxDto.getRoomId().matches("[0-9]+[А-Яа-яA-Za-z]*")) {
+			sb.append("Невалиден избор на стая!</br>");
+		}
+		
+		if (nightTaxDto.getHostId() == 0) {
+			sb.append("Невалиден избор на домакин!</br>");
+		}
+
+		if (nightTaxDto.getDate() == null || "".equals(nightTaxDto.getDate())) {
+			sb.append("Невалиден избор на дата!");
+		}
+
+		if (sb.length() != 0) {
+			return new StructuredResponse(400, RESPONSE_STATUS.FAIL, null, sb.toString());
+		}
 
 		// expect list, because of more than one existing night taxes, otherwise
 		// Exception
@@ -57,24 +78,25 @@ public class NightTaxServiceImpl implements NightTaxService {
 				nightTaxDto.getGuestName(), dateUtil.convertFromStringToDate(nightTaxDto.getDate()));
 
 		if (existingNightTaxes.size() > 0) {
-			message = "Текущата нощувка е въведена. Домакин: " + nightTaxDto.getHostName() + ", гост: "
-					+ nightTaxDto.getGuestName() + ", дата: " + nightTaxDto.getDate();
+			sb.append("Текущата нощувка е въведена. Домакин: " + nightTaxDto.getHostName() + ", гост: "
+					+ nightTaxDto.getGuestName() + ", дата: " + nightTaxDto.getDate());
 
-			return new StructuredResponse(409, RESPONSE_STATUS.FAIL, null, message);
+			return new StructuredResponse(409, RESPONSE_STATUS.FAIL, null, sb.toString());
 		}
 
 		NightTax nightTax = toEntity(nightTaxDto);
 
 		nightTax = nightTaxRepository.save(nightTax);
 
-		message = "Успешно създадена нощувка. Домакин: " + nightTax.getHost().getUsername() + ", гост: "
-				+ nightTax.getGuestName() + ", дата: " + dateUtil.convertFromDateToString(nightTax.getDate());
+		sb.append("Успешно създадена нощувка. Домакин: " + nightTax.getHost().getUsername() + ", гост: "
+				+ nightTax.getGuestName() + ", дата: " + dateUtil.convertFromDateToString(nightTax.getDate()));
 
 		User host = nightTax.getHost();
-		
-		mailUtil.sendMail(host.getEmail(), host.getUsername(), nightTaxDto.getGuestName(), nightTaxDto.getDate());
 
-		return new StructuredResponse(200, RESPONSE_STATUS.SUCCESS, null, message);
+		mailUtil.sendMailForNightTax(host.getEmail(), host.getUsername(), nightTaxDto.getGuestName(),
+				nightTaxDto.getDate());
+
+		return new StructuredResponse(200, RESPONSE_STATUS.SUCCESS, null, sb.toString());
 	}
 
 	@Override
@@ -96,20 +118,20 @@ public class NightTaxServiceImpl implements NightTaxService {
 
 		return pageUtil.createPagination(pageNumber, pagesCount);
 	}
-	
+
 	private NightTax toEntity(NightTaxDto nightTaxDto) {
 		NightTax nightTax = new NightTax();
 
 		User host = userRepository.findOne(nightTaxDto.getHostId());
-		
+
 		nightTax.setHost(host);
-		nightTax.setRoom(roomRepository.findOne(nightTaxDto.getRoomId()));
+		nightTax.setRoom(roomRepository.findOne(Integer.parseInt(nightTaxDto.getRoomId())));
 		nightTax.setGuestName(nightTaxDto.getGuestName());
 		nightTax.setDate(dateUtil.convertFromStringToDate(nightTaxDto.getDate()));
 		nightTax.setCreator(userRepository.findOne(1));
 		nightTax.setStatus(NightTaxStatusEnum.UNPAID);
 		nightTax.setDateCreated(new Date());
-		
+
 		return nightTax;
 	}
 

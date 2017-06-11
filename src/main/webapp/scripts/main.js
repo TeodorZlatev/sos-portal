@@ -163,14 +163,25 @@ function createDivInsertInhabitant() {
 		value : "personalNumber"
 	} ]);
 	
+	var trEmail = createElement(table, "tr");
+	var tdEmailOutput = createElement(trEmail, "td");
+	createElement(tdEmailOutput, "output", "Е-mail:");
+	var tdEmailInput = createElement(trEmail, "td");
+	createElement(tdEmailInput, "input", null, null, [ {
+		name : "id",
+		value : "email"
+	} ]);
+	
 	var trRoom = createElement(table, "tr");
 	var tdRoomOutput = createElement(trRoom, "td");
-	createElement(tdRoomOutput, "output",  "Стая:");
-	var tdRoomInput = createElement(trRoom, "td");
-	createElement(tdRoomInput, "input", null, null, [ {
+	createElement(tdRoomOutput, "output", "Стая: ");
+	var tdRoomSelect = createElement(trRoom, "td");
+	createElement(tdRoomSelect, "select", null, null, [ {
 		name : "id",
-		value : "room"
+		value : "rooms"
 	} ]);
+	
+	loadRoomsByBlock();
 
 	createElement(mainDiv, "button", "Запази", insertInhabitant);
 }
@@ -179,12 +190,15 @@ function insertInhabitant() {
 
 	var inhabited = document.getElementById("inhabited").value;
 	var personalNumber = document.getElementById("personalNumber").value;
-	var room = document.getElementById("room").value;
+	var email = document.getElementById("email").value;
+	var rooms = document.getElementById("rooms");
+	var roomId = rooms.options[rooms.selectedIndex].value;
 
 	var data = JSON.stringify({
 		"username" : inhabited,
 		"personalNumber" : personalNumber,
-		"room" : room,
+		"email" : email,
+		"roomId" : roomId,
 	});
 
 	requestHeader = [ {
@@ -196,7 +210,11 @@ function insertInhabitant() {
 	} ]
 
 	createAjaxRequest(function(responseText) {
-		showMessage(responseText);
+		var result = showMessage(responseText);
+		
+		if (result === "SUCCESS") {
+			createDivInsertInhabitant();
+		}
 	}, "POST", "/sos-portal/inhabitant", data, requestHeader);
 
 }
@@ -403,6 +421,8 @@ function createDivPeopleWithNightTaxes() {
 	var thNames = createElement(tr, "th", "Имена");
 
 	var thPersonalNumber = createElement(tr, "th", "ЕГН");
+	
+	var thRoom = createElement(tr, "th", "Стая");
 
 	var thUnpaid = createElement(tr, "th", "Неплатени");
 
@@ -505,14 +525,19 @@ function fillInPeopleTable(people) {
 				.createTextNode(people[index].personalNumber);
 		tdPersonalNumber.appendChild(personalNumberText);
 		tr.appendChild(tdPersonalNumber);
+		
+		var tdRoom = document.createElement("td");
+		var roomText = document.createTextNode(people[index].roomNumber);
+		tdRoom.appendChild(roomText);
+		tr.appendChild(tdRoom);
 
 		var tdUnpaid = document.createElement("td");
-		tdUnpaid.appendChild(createAHrefNightTaxesStatus(people[index].id,
+		tdUnpaid.appendChild(createButtonNightTaxesStatus(people[index].id,
 				"неплатени", "UNPAID"));
 		tr.appendChild(tdUnpaid);
 
 		var tdPaid = document.createElement("td");
-		tdPaid.appendChild(createAHrefNightTaxesStatus(people[index].id,
+		tdPaid.appendChild(createButtonNightTaxesStatus(people[index].id,
 				"платени", "PAID"));
 		tr.appendChild(tdPaid);
 
@@ -534,10 +559,10 @@ function searchPeople() {
 	}, "GET", "/sos-portal/search?marker=" + marker + "&blockId=" + 1 + "&pageNumber=" + 1);
 }
 
-function createAHrefNightTaxesStatus(userId, innerHTML, status) {
-	var a = document.createElement("a");
+function createButtonNightTaxesStatus(userId, innerHTML, status) {
+	var button = document.createElement("button");
 
-	a.onclick = function() {
+	button.onclick = function() {
 		document.getElementById("mainDiv").innerHTML = "";
 
 		createDivNightTaxesPerPerson();
@@ -545,9 +570,9 @@ function createAHrefNightTaxesStatus(userId, innerHTML, status) {
 		fetchNightTaxesPerPerson(userId, status, 1);
 	};
 
-	a.innerHTML = innerHTML;
+	button.innerHTML = innerHTML;
 
-	return a;
+	return button;
 }
 
 // NIGHT TAXES PER PERSON

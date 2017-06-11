@@ -14,6 +14,7 @@ import bg.tu.sofia.constants.RoleEnum;
 import bg.tu.sofia.dtos.UserDto;
 import bg.tu.sofia.services.UserService;
 import bg.tu.sofia.utils.HeaderUtil;
+import bg.tu.sofia.utils.StructuredResponse;
 
 @RestController
 public class UserController {
@@ -35,9 +36,10 @@ public class UserController {
 	
 	@RequestMapping(method = RequestMethod.POST,
 					value = "/inhabitant",
+					produces = MediaType.APPLICATION_JSON_VALUE,
 					consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void insertInhabitant(@RequestBody UserDto user) {
-		userService.insertInhabitant(user);
+	public StructuredResponse insertInhabitant(@RequestBody UserDto user) {
+		return userService.insertInhabitant(user);
 	}
 	
 	@RequestMapping(

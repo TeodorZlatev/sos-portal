@@ -5,7 +5,8 @@ public class UserDto {
 	private String username;
 	private String personalNumber;
 	private String email;
-	private String room;
+	private String roomId;
+	private String roomNumber;
 	private int roleId;
 
 	public int getId() {
@@ -40,12 +41,20 @@ public class UserDto {
 		this.email = email;
 	}
 
-	public String getRoom() {
-		return room;
+	public String getRoomId() {
+		return roomId;
 	}
 
-	public void setRoom(String room) {
-		this.room = room;
+	public void setRoomId(String roomId) {
+		this.roomId = roomId;
+	}
+
+	public String getRoomNumber() {
+		return roomNumber;
+	}
+
+	public void setRoomNumber(String roomNumber) {
+		this.roomNumber = roomNumber;
 	}
 
 	public int getRoleId() {

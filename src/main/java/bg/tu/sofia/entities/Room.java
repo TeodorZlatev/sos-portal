@@ -7,7 +7,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
+@NamedQueries({
+		@NamedQuery(name = "Room.findByUserId", query = "SELECT r.number FROM UserRoom ur JOIN ur.room r WHERE ur.user.id = :userId") })
 
 @Entity
 @Table(name = "room")

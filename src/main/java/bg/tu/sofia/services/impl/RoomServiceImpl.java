@@ -25,10 +25,15 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public RoomDto getByNumberAndBlockId(String roomNumber, int blockId) {
-		Room room = roomRepository.findByNumberAndBlockId(roomNumber, blockId);
+	public RoomDto getByRoomId(int roomId) {
+		Room room = roomRepository.findOne(roomId);
 		
 		return this.fromEntity(room);
+	}
+	
+	@Override
+	public String getRoomByUserId(int userId) {
+		return roomRepository.findByUserId(userId);
 	}
 	
 	private Room toEntity(RoomDto roomDto) {
@@ -50,4 +55,5 @@ public class RoomServiceImpl implements RoomService {
 		
 		return roomDto;
 	}
+
 }
