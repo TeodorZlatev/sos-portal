@@ -9,5 +9,5 @@ public interface RoomService {
 
 	public RoomDto getByRoomId(int roomId);
 
-	public String getRoomByUserId(int userId);
+	public RoomDto getRoomByUserId(int userId);
 }

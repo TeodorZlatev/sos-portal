@@ -12,7 +12,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-		@NamedQuery(name = "Room.findByUserId", query = "SELECT r.number FROM UserRoom ur JOIN ur.room r WHERE ur.user.id = :userId") })
+		@NamedQuery(name = "Room.findByUserId", query = "SELECT r FROM UserRoom ur JOIN ur.room r WHERE ur.user.id = :userId") })
 
 @Entity
 @Table(name = "room")

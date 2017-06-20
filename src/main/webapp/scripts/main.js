@@ -1,6 +1,17 @@
 window.onload = function() {
+	decode();
 	createHeader();
 	createDivPeopleWithNightTaxes();
+}
+
+function decode() {
+	var token = localStorage.getItem("token");
+	
+	var payload = JSON.parse(window.atob(token.split('.')[1]));
+	
+	localStorage.setItem("userId", payload.userId);
+	localStorage.setItem("roomId", payload.roomId);
+	localStorage.setItem("blockId", payload.blockId);
 }
 
 // window.onload = function() {
@@ -69,43 +80,39 @@ function createElement(destination, element, innerHTML, onclick, attributes,
 		}
 	}
 
-	destination.appendChild(element);
-
+	if (destination) {
+		destination.appendChild(element);
+	}
+	
 	return element;
 }
 
 function createHeader() {
-	createAjaxRequest(function(responseText) {
-		var data = JSON.parse(responseText);
 
-		var menu = document.getElementById("menu");
+	var menu = document.getElementById("menu");
 
-		for (i = 0; i < data.length; i++) {
+	createHeaderHelper(menu, createDivPeopleWithNightTaxes, "Хора с нощувки");
 
-			var li = createHeaderHelper(data[i]);
+	createHeaderHelper(menu, createDivCreateNightTax, "Вписване на нощувка");
 
-			menu.appendChild(li);
-		}
+	createHeaderHelper(menu, createDivInsertInhabitant, "Вписване на живущ");
 
-	}, "GET", "/sos-portal/header");
 }
-
-function createHeaderHelper(data) {
+		
+function createHeaderHelper(menu, onclick, innerHTML) {
 	var li = document.createElement("li");
 
 	li.setAttribute("class", "item")
 
 	var a = document.createElement("a");
 
-	a.onclick = function() {
-		window[data.onclick]();
-	};
+	a.onclick = onclick;
 
-	a.innerHTML = data.innerHTML;
+	a.innerHTML = innerHTML;
 
 	li.appendChild(a);
 
-	return li;
+	menu.appendChild(li);
 }
 
 function showMessage(responseData) {
@@ -560,17 +567,14 @@ function searchPeople() {
 }
 
 function createButtonNightTaxesStatus(userId, innerHTML, status) {
-	var button = document.createElement("button");
 
-	button.onclick = function() {
+	var button = createElement(null, "button", innerHTML, function() {
 		document.getElementById("mainDiv").innerHTML = "";
 
 		createDivNightTaxesPerPerson();
 
 		fetchNightTaxesPerPerson(userId, status, 1);
-	};
-
-	button.innerHTML = innerHTML;
+	});
 
 	return button;
 }

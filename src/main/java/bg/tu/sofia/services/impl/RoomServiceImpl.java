@@ -32,8 +32,8 @@ public class RoomServiceImpl implements RoomService {
 	}
 	
 	@Override
-	public String getRoomByUserId(int userId) {
-		return roomRepository.findByUserId(userId);
+	public RoomDto getRoomByUserId(int userId) {
+		return this.fromEntity(roomRepository.findByUserId(userId));
 	}
 	
 	private Room toEntity(RoomDto roomDto) {

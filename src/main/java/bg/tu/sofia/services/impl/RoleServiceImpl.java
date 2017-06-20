@@ -23,7 +23,7 @@ public class RoleServiceImpl implements RoleService {
 		RoleDto roleDto = new RoleDto();
 		
 		roleDto.setId(role.getId());
-		roleDto.setName(role.getName());
+		roleDto.setName(role.getName().toString());
 		
 		return roleDto;
 	}

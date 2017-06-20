@@ -13,5 +13,5 @@ public interface RoomRepository extends PagingAndSortingRepository<Room, Integer
 
 	public Room findByNumberAndBlockId(String roomNumber, int blockId);
 
-	public String findByUserId(@Param("userId") int userId);
+	public Room findByUserId(@Param("userId") int userId);
 }

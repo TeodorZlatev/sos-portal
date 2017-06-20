@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import bg.tu.sofia.constants.RoleEnum;
 import bg.tu.sofia.dtos.UserDto;
 import bg.tu.sofia.services.UserService;
-import bg.tu.sofia.utils.HeaderUtil;
 import bg.tu.sofia.utils.StructuredResponse;
 
 @RestController
@@ -22,9 +20,6 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@Autowired
-	private HeaderUtil headerUtil;
-
 	@RequestMapping(method = RequestMethod.GET,
 					value = "/hosts",
 					produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,14 +51,6 @@ public class UserController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public String getPeopleWithNightTaxesByBlockIdCount(@RequestParam int blockId, @RequestParam int pageNumber) {
 		return userService.getCountPeopleWithNightTaxes(blockId, pageNumber);
-	}
-	
-	@RequestMapping(
-			method = RequestMethod.GET,
-			value = "/header",
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public String generateHeader(){
-		return headerUtil.createHeader(RoleEnum.ADMINISTRATOR);
 	}
 	
 	@RequestMapping(

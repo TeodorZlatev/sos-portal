@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
-import bg.tu.sofia.constants.RoleEnum;
 import bg.tu.sofia.dtos.RoomDto;
 import bg.tu.sofia.dtos.UserDto;
 import bg.tu.sofia.dtos.UserRoomDto;
@@ -21,6 +20,7 @@ import bg.tu.sofia.entities.User;
 import bg.tu.sofia.repositories.CredentialsRepository;
 import bg.tu.sofia.repositories.TokenRepository;
 import bg.tu.sofia.repositories.UserRepository;
+import bg.tu.sofia.services.RoleService;
 import bg.tu.sofia.services.RoomService;
 import bg.tu.sofia.services.UserRoomService;
 import bg.tu.sofia.services.UserService;
@@ -48,6 +48,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private RoomService roomService;
+	
+	@Autowired
+	private RoleService roleService;
 
 	@Autowired
 	private PageUtil pageUtil;
@@ -138,7 +141,7 @@ public class UserServiceImpl implements UserService {
 		return pageUtil.createPagination(pageNumber, pagesCount);
 	}
 
-	public Integer authenticateUser(String personalNumber, String password) throws Exception {
+	public User authenticateUser(String personalNumber, String password) throws Exception {
 		User user = this.userRepository.findByPersonalNumber(personalNumber);
 
 		if (user == null) {
@@ -151,7 +154,7 @@ public class UserServiceImpl implements UserService {
 			throw new Exception("password");
 		}
 
-		return user.getId();
+		return user;
 	}
 
 	public void insertToken(int userId, String token) {
@@ -180,7 +183,7 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(userDto.getEmail());
 
 		Role role = new Role();
-		role.setId(RoleEnum.INHABITED.getId());
+		role.setId(userDto.getRoleId());
 		user.setRole(role);
 
 		return user;
@@ -195,7 +198,7 @@ public class UserServiceImpl implements UserService {
 		userDto.setEmail(user.getEmail());
 		userDto.setRoleId(user.getRole().getId());
 
-		String roomNumber = roomService.getRoomByUserId(user.getId());
+		String roomNumber = roomService.getRoomByUserId(user.getId()).getNumber();
 
 		userDto.setRoomNumber(roomNumber);
 

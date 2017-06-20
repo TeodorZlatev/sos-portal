@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import bg.tu.sofia.dtos.UserDto;
+import bg.tu.sofia.entities.User;
 import bg.tu.sofia.utils.StructuredResponse;
 
 @Component
@@ -20,7 +21,7 @@ public interface UserService {
 	
 	public String getCountPeopleWithNightTaxes(int blockId, int pageNumber);
 	
-	public Integer authenticateUser(String personalNumber, String password) throws Exception;
+	public User authenticateUser(String personalNumber, String password) throws Exception;
 
 	public void insertToken(int userId, String token);
 
