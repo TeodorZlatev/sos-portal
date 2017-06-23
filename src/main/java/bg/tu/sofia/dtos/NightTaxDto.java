@@ -4,6 +4,8 @@ import bg.tu.sofia.constants.NightTaxStatusEnum;
 
 public class NightTaxDto {
 	private String guestName;
+	private int blockId;
+	private String blockNumber;
 	private String roomId;
 	private String roomNumber;
 	private int hostId;
@@ -20,6 +22,22 @@ public class NightTaxDto {
 
 	public void setGuestName(String guestName) {
 		this.guestName = guestName;
+	}
+
+	public int getBlockId() {
+		return blockId;
+	}
+
+	public void setBlockId(int blockId) {
+		this.blockId = blockId;
+	}
+
+	public String getBlockNumber() {
+		return blockNumber;
+	}
+
+	public void setBlockNumber(String blockNumber) {
+		this.blockNumber = blockNumber;
 	}
 
 	public String getRoomId() {

@@ -10,13 +10,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import bg.tu.sofia.constants.NightTaxStatusEnum;
+import bg.tu.sofia.dtos.BlockDto;
 import bg.tu.sofia.dtos.NightTaxDto;
+import bg.tu.sofia.dtos.RoomDto;
 import bg.tu.sofia.entities.NightTax;
+import bg.tu.sofia.entities.Room;
 import bg.tu.sofia.entities.User;
 import bg.tu.sofia.repositories.NightTaxRepository;
-import bg.tu.sofia.repositories.RoomRepository;
 import bg.tu.sofia.repositories.UserRepository;
+import bg.tu.sofia.services.BlockService;
 import bg.tu.sofia.services.NightTaxService;
+import bg.tu.sofia.services.RoomService;
 import bg.tu.sofia.utils.DateUtil;
 import bg.tu.sofia.utils.MailUtil;
 import bg.tu.sofia.utils.PageUtil;
@@ -32,7 +36,10 @@ public class NightTaxServiceImpl implements NightTaxService {
 	private UserRepository userRepository;
 
 	@Autowired
-	private RoomRepository roomRepository;
+	private RoomService roomService;
+	
+	@Autowired
+	private BlockService blockService;
 
 	@Autowired
 	private NightTaxRepository nightTaxRepository;
@@ -125,7 +132,11 @@ public class NightTaxServiceImpl implements NightTaxService {
 		User host = userRepository.findOne(nightTaxDto.getHostId());
 
 		nightTax.setHost(host);
-		nightTax.setRoom(roomRepository.findOne(Integer.parseInt(nightTaxDto.getRoomId())));
+		
+		Room room = new Room();
+		room.setId(Integer.parseInt(nightTaxDto.getRoomId()));
+		
+		nightTax.setRoom(room);
 		nightTax.setGuestName(nightTaxDto.getGuestName());
 		nightTax.setDate(dateUtil.convertFromStringToDate(nightTaxDto.getDate()));
 		nightTax.setCreator(userRepository.findOne(1));
@@ -138,7 +149,16 @@ public class NightTaxServiceImpl implements NightTaxService {
 	private NightTaxDto fromEntity(NightTax nightTax) {
 		NightTaxDto nightTaxDto = new NightTaxDto();
 
-		nightTaxDto.setRoomNumber(roomRepository.findOne(nightTax.getRoom().getId()).getNumber());
+		RoomDto room = roomService.getByRoomId(nightTax.getRoom().getId());
+		
+		nightTaxDto.setRoomId(room.getId() + "");
+		nightTaxDto.setRoomNumber(room.getNumber());
+		
+		BlockDto block = blockService.getBlockIdById(room.getBlockId());
+		
+		nightTaxDto.setBlockId(block.getId());
+		nightTaxDto.setBlockNumber(block.getNumber());
+		
 		nightTaxDto.setStatus(nightTax.getStatus());
 		nightTaxDto.setDate(dateUtil.convertFromDateToString(nightTax.getDate()));
 		nightTaxDto.setHostName(userRepository.findOne(nightTax.getHost().getId()).getUsername());

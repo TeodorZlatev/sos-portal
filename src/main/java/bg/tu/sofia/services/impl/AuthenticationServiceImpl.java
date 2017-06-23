@@ -17,17 +17,17 @@ import bg.tu.sofia.utils.StructuredResponse.RESPONSE_STATUS;
 
 @Component
 public class AuthenticationServiceImpl implements AuthenticationService {
-	
-	@Autowired 
+
+	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private RoomService roomService;
-	
-	@Autowired 
+
+	@Autowired
 	private BlockService blockService;
-	
-	@Autowired 
+
+	@Autowired
 	private JwtTokenGenerator jwtTokenGenerator;
 
 	@Override
@@ -36,22 +36,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			User user = this.userService.authenticateUser(personalNumber, password);
 
 			if (user != null) {
-				
+
 				JwtUserDto jwtUser = new JwtUserDto();
 				jwtUser.setId(user.getId());
-				jwtUser.setRole(user.getRole().getName().toString());
 				
-				RoomDto room = this.roomService.getRoomByUserId(user.getId());
-				jwtUser.setRoomId(room.getId() + "");
+				String currentRole = user.getRole().getName().toString();
 				
-				if ("ROLE_HOST".equals(user.getRole().getName())) {
-					jwtUser.setBlockId(this.blockService.getBlockIdByUserId(user.getId()) + "");
-				} else if ("ROLE_INHABITED".equals(user.getRole().getName())) {
+				jwtUser.setRole(currentRole);
+				
+				if (Constants.INHABITED.equals(currentRole)) {
+					RoomDto room = this.roomService.getRoomByUserId(user.getId());
+					jwtUser.setRoomId(room.getId() + "");
 					jwtUser.setBlockId(room.getBlockId() + "");
-				}
-				
+				} else if (Constants.HOST.equals(currentRole)) {
+					jwtUser.setBlockId(this.blockService.getBlockByHostId(user.getId()).getId() + "");
+				}  
+
 				String token = jwtTokenGenerator.generateToken(jwtUser, Constants.SECRET_KEY);
-				
+
 				return new StructuredResponse(200, RESPONSE_STATUS.SUCCESS, token, null);
 			}
 

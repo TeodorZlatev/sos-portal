@@ -19,7 +19,7 @@ public class Block {
 	private String number;
 	@OneToOne
 	@JoinColumn(name = "host_id")
-	private User user;
+	private User host;
 
 	public int getId() {
 		return id;
@@ -37,12 +37,12 @@ public class Block {
 		this.number = number;
 	}
 
-	public User getUser() {
-		return user;
+	public User getHost() {
+		return host;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setHost(User host) {
+		this.host = host;
 	}
 
 }

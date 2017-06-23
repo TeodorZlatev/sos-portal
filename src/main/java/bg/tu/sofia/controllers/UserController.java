@@ -39,6 +39,14 @@ public class UserController {
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
+			value = "/userNightTaxes",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public UserDto getPersonWithNightTaxes(@RequestParam int userId) {
+		return userService.getPersonWithNightTaxes(userId);
+	}
+	
+	@RequestMapping(
+			method = RequestMethod.GET,
 			value = "/usersNightTaxesAboutBlock",
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserDto> getPeopleWithNightTaxesByBlockId(@RequestParam int blockId, @RequestParam int pageNumber) {
@@ -51,6 +59,22 @@ public class UserController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public String getPeopleWithNightTaxesByBlockIdCount(@RequestParam int blockId, @RequestParam int pageNumber) {
 		return userService.getCountPeopleWithNightTaxes(blockId, pageNumber);
+	}
+	
+	@RequestMapping(
+			method = RequestMethod.GET,
+			value = "/allUsersNightTaxes",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<UserDto> getPeopleWithNightTaxes(@RequestParam int pageNumber) {
+		return userService.getPeopleWithNightTaxes(pageNumber);
+	}
+	
+	@RequestMapping(
+			method = RequestMethod.GET,
+			value = "/allUsersNightTaxesCount",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public String getPeopleWithNightTaxesCount(@RequestParam int pageNumber) {
+		return userService.getCountPeopleWithNightTaxes(pageNumber);
 	}
 	
 	@RequestMapping(

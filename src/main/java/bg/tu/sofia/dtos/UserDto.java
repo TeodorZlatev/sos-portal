@@ -8,6 +8,7 @@ public class UserDto {
 	private String roomId;
 	private String roomNumber;
 	private String blockId;
+	private String blockNumber;
 	private int roleId;
 
 	public int getId() {
@@ -64,6 +65,14 @@ public class UserDto {
 
 	public void setBlockId(String blockId) {
 		this.blockId = blockId;
+	}
+
+	public String getBlockNumber() {
+		return blockNumber;
+	}
+
+	public void setBlockNumber(String blockNumber) {
+		this.blockNumber = blockNumber;
 	}
 
 	public int getRoleId() {

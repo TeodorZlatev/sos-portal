@@ -1,7 +1,5 @@
 package bg.tu.sofia.services.impl;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,16 +8,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import bg.tu.sofia.dtos.BlockDto;
 import bg.tu.sofia.dtos.RoomDto;
 import bg.tu.sofia.dtos.UserDto;
 import bg.tu.sofia.dtos.UserRoomDto;
 import bg.tu.sofia.entities.Credentials;
 import bg.tu.sofia.entities.Role;
-import bg.tu.sofia.entities.Token;
 import bg.tu.sofia.entities.User;
 import bg.tu.sofia.repositories.CredentialsRepository;
 import bg.tu.sofia.repositories.TokenRepository;
 import bg.tu.sofia.repositories.UserRepository;
+import bg.tu.sofia.services.BlockService;
 import bg.tu.sofia.services.RoleService;
 import bg.tu.sofia.services.RoomService;
 import bg.tu.sofia.services.UserRoomService;
@@ -50,6 +49,9 @@ public class UserServiceImpl implements UserService {
 	private RoomService roomService;
 	
 	@Autowired
+	private BlockService blockService;
+
+	@Autowired
 	private RoleService roleService;
 
 	@Autowired
@@ -70,7 +72,7 @@ public class UserServiceImpl implements UserService {
 		// TODO: validation save user, but not userRoom
 		StringBuilder sb = new StringBuilder();
 
-		if (userDto.getUsername() == null || !userDto.getUsername().matches("[А-Яа-я]+[ ][А-Яа-я]+[ ][А-Яа-я]+")) {
+		if (userDto.getUsername() == null || !userDto.getUsername().matches("[А-Яа-я]+[ ]*[А-Яа-я]*[ ]*[А-Яа-я]*")) {
 			sb.append("Невалидни имена! (пр. Иван Иванов Иванов)</br>");
 		}
 
@@ -81,7 +83,7 @@ public class UserServiceImpl implements UserService {
 		if (userDto.getEmail() == null || !userDto.getEmail().matches("[A-Za-z0-9._]+@[a-z]+.[a-z]+")) {
 			sb.append("Невалиден email! (пр. test_1@gmail.com)</br>");
 		}
-		
+
 		if (userDto.getRoomId() == null || !userDto.getRoomId().matches("[0-9]+[А-Яа-яA-Za-z]*")) {
 			sb.append("Невалиден избор на стая!");
 		}
@@ -92,6 +94,10 @@ public class UserServiceImpl implements UserService {
 
 		User user = this.toEntity(userDto);
 
+		if (user.getRole().getId() == 0) {
+			user.getRole().setId(1);
+		}
+		
 		userRepository.save(user);
 
 		RoomDto roomDto = roomService.getByRoomId(Integer.parseInt(userDto.getRoomId()));
@@ -108,6 +114,17 @@ public class UserServiceImpl implements UserService {
 		mailUtil.sendMailForRegistration(userDto, roomDto.getNumber());
 
 		return new StructuredResponse(200, RESPONSE_STATUS.SUCCESS, null, sb.toString());
+	}
+
+	@Override
+	public UserDto getPersonWithNightTaxes(int userId) {
+
+		User user = userRepository.getPersonWithNightTaxesByUserId(userId);
+		if (user == null){
+			return null;
+		}
+
+		return this.fromEntity(user);
 	}
 
 	@Override
@@ -141,6 +158,25 @@ public class UserServiceImpl implements UserService {
 		return pageUtil.createPagination(pageNumber, pagesCount);
 	}
 
+	@Override
+	public List<UserDto> getPeopleWithNightTaxes(int pageNumber) {
+		PageRequest pageable = new PageRequest(pageNumber - 1, PAGE_SIZE);
+
+		Page<User> users = userRepository.getPageOfPeopleWithTaxes(pageable);
+
+		return users.getContent().stream().map(this::fromEntity).collect(Collectors.toList());
+
+	}
+
+	@Override
+	public String getCountPeopleWithNightTaxes(int pageNumber) {
+		PageRequest pageable = new PageRequest(0, PAGE_SIZE);
+
+		int pagesCount = userRepository.getPageOfPeopleWithTaxes(pageable).getTotalPages();
+
+		return pageUtil.createPagination(pageNumber, pagesCount);
+	}
+	
 	public User authenticateUser(String personalNumber, String password) throws Exception {
 		User user = this.userRepository.findByPersonalNumber(personalNumber);
 
@@ -155,23 +191,6 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return user;
-	}
-
-	public void insertToken(int userId, String token) {
-		Token mainToken = new Token();
-
-		mainToken.setToken(token);
-		mainToken.setUserId(userId);
-
-		Date date = new Date();
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.DATE, 1);
-		date = c.getTime();
-
-		mainToken.setExpirationDate(date);
-
-		this.tokenRepository.save(mainToken);
 	}
 
 	private User toEntity(UserDto userDto) {
@@ -198,9 +217,13 @@ public class UserServiceImpl implements UserService {
 		userDto.setEmail(user.getEmail());
 		userDto.setRoleId(user.getRole().getId());
 
-		String roomNumber = roomService.getRoomByUserId(user.getId()).getNumber();
-
-		userDto.setRoomNumber(roomNumber);
+		RoomDto room = roomService.getRoomByUserId(user.getId());
+		userDto.setRoomId(room.getId() + "");
+		userDto.setRoomNumber(room.getNumber());
+		
+		BlockDto block = blockService.getBlockIdById(room.getBlockId());
+		userDto.setBlockId(block.getId() + "");
+		userDto.setBlockNumber(block.getNumber());
 
 		return userDto;
 	}

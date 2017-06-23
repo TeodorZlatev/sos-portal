@@ -22,4 +22,10 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 
 	public User findByPersonalNumber(String personalNumber);
 
+	// Query - bg.tu.sofia.entities.User
+	public User getPersonWithNightTaxesByUserId(@Param("userId") int userId);
+
+	// Query - bg.tu.sofia.entities.User
+	public Page<User> getPageOfPeopleWithTaxes(Pageable pageable);
+
 }

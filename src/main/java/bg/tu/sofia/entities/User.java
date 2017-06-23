@@ -14,7 +14,9 @@ import javax.persistence.Table;
 @NamedQueries({
 		@NamedQuery(name = "User.findAllByRoomIdAndBlockId", query = "SELECT u FROM UserRoom ur JOIN ur.room r JOIN ur.user u WHERE r.id = :roomId AND r.block.id = :blockId"),
 		@NamedQuery(name = "User.getPageOfPeopleWithTaxesByBlockId", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r WHERE r.block.id = :blockId ORDER BY u.username"),
-		@NamedQuery(name = "User.getPageOfPeopleWithTaxesByBlockIdAndMarker", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r WHERE r.block.id = :blockId AND u.username LIKE :marker ORDER BY u.username") })
+		@NamedQuery(name = "User.getPageOfPeopleWithTaxesByBlockIdAndMarker", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r WHERE r.block.id = :blockId AND u.username LIKE :marker ORDER BY u.username"),
+		@NamedQuery(name = "User.getPersonWithNightTaxesByUserId", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u WHERE u.id = :userId"),
+		@NamedQuery(name = "User.getPageOfPeopleWithTaxes", query = "SELECT DISTINCT u FROM NightTax nt JOIN nt.host u JOIN nt.room r ORDER BY u.username") })
 
 @Entity
 @Table(name = "user")

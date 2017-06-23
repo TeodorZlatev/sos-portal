@@ -36,8 +36,12 @@ li {
 	padding-bottom: 5px;
 }
 
-.item {
+.left {
 	float: left;
+}
+
+.right {
+	float: right;
 }
 
 .item a {
@@ -50,23 +54,6 @@ li {
 }
 
 .item a:hover {
-	color: green;
-}
-
-.right-item {
-	float: right;
-}
-
-.right-item a {
-	font-family: "Segoe Print";
-	font-weight: bold;
-	font-size: 35px;
-	color: black;
-	padding: 0px 35px;
-	text-decoration: none;
-}
-
-.right-item a:hover {
 	color: green;
 }
 

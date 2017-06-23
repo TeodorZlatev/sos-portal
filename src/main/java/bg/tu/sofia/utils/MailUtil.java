@@ -32,8 +32,8 @@ public class MailUtil {
 		msg.setSubject("Регистрация в портал на СОС");
 		msg.setTo(inhabited.getEmail());
 		msg.setText("Здравейте, " + inhabited.getUsername()
-				+ ",\n\n успешно ви бе създадена регистрация в портала на СОС (http://localhost:8080/sos-portal/). \n\nЛични данни:\nЕГН: "
-				+ inhabited.getPersonalNumber() + "\nEmail: " + inhabited.getEmail() + "Стая: " + room
+				+ ",\n\n успешно ви бе създадена регистрация в портала на СОС ( http://localhost:8080/sos-portal ). \n\nЛични данни:\nЕГН: "
+				+ inhabited.getPersonalNumber() + "\nEmail: " + inhabited.getEmail() + "\nСтая: " + room
 				+ "\n\nСтудентски общежития и столове, ТУ - София");
 
 		this.mailSender.send(msg);
