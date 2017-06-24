@@ -47,41 +47,25 @@ public class UserController {
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/usersNightTaxesAboutBlock",
+			value = "/usersNightTaxes",
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserDto> getPeopleWithNightTaxesByBlockId(@RequestParam int blockId, @RequestParam int pageNumber) {
+	public List<UserDto> getPeopleWithNightTaxes(@RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
 		return userService.getPeopleWithNightTaxes(blockId, pageNumber);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/usersNightTaxesAboutBlockCount",
+			value = "/usersNightTaxesCount",
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public String getPeopleWithNightTaxesByBlockIdCount(@RequestParam int blockId, @RequestParam int pageNumber) {
+	public String getPeopleWithNightTaxesCount(@RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
 		return userService.getCountPeopleWithNightTaxes(blockId, pageNumber);
-	}
-	
-	@RequestMapping(
-			method = RequestMethod.GET,
-			value = "/allUsersNightTaxes",
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserDto> getPeopleWithNightTaxes(@RequestParam int pageNumber) {
-		return userService.getPeopleWithNightTaxes(pageNumber);
-	}
-	
-	@RequestMapping(
-			method = RequestMethod.GET,
-			value = "/allUsersNightTaxesCount",
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public String getPeopleWithNightTaxesCount(@RequestParam int pageNumber) {
-		return userService.getCountPeopleWithNightTaxes(pageNumber);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
 			value = "/search",
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserDto> searchByMarker(@RequestParam String marker, @RequestParam int blockId, @RequestParam int pageNumber) {
+	public List<UserDto> searchByMarker(@RequestParam String marker, @RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
 		return userService.getPeopleWithNightTaxesByMarker(marker, blockId, pageNumber);
 	}
 }

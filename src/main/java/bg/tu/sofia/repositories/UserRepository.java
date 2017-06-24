@@ -15,17 +15,21 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	public List<User> findAllByRoomIdAndBlockId(@Param("roomId") int roomId, @Param("blockId") int blockId);
 
 	// Query - bg.tu.sofia.entities.User
+	public Page<User> getPageOfPeopleWithTaxes(Pageable pageable);
+
+	// Query - bg.tu.sofia.entities.User
 	public Page<User> getPageOfPeopleWithTaxesByBlockId(@Param("blockId") int blockId, Pageable pageable);
 
 	// Query - bg.tu.sofia.entities.User
-	public Page<User> getPageOfPeopleWithTaxesByBlockIdAndMarker(@Param("marker") String marker, @Param("blockId") int blockId, Pageable pageable);
+	public Page<User> getPageOfPeopleWithTaxesByBlockIdAndMarker(@Param("marker") String marker,
+			@Param("blockId") int blockId, Pageable pageable);
+
+	// Query - bg.tu.sofia.entities.User
+	public Page<User> getPageOfPeopleWithTaxesByMarker(@Param("marker") String marker, Pageable pageable);
 
 	public User findByPersonalNumber(String personalNumber);
 
 	// Query - bg.tu.sofia.entities.User
 	public User getPersonWithNightTaxesByUserId(@Param("userId") int userId);
-
-	// Query - bg.tu.sofia.entities.User
-	public Page<User> getPageOfPeopleWithTaxes(Pageable pageable);
 
 }

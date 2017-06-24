@@ -165,7 +165,8 @@ public class NightTaxServiceImpl implements NightTaxService {
 		nightTaxDto.setGuestName(nightTax.getGuestName());
 		nightTaxDto.setCreatorName(userRepository.findOne(nightTax.getCreator().getId()).getUsername());
 		nightTaxDto.setDateCreated(dateUtil.convertFromDateWithTimeToString(nightTax.getDateCreated()));
-
+		nightTaxDto.setDatePaid(dateUtil.convertFromDateWithTimeToString(nightTax.getDatePaid()));
+		
 		return nightTaxDto;
 	}
 

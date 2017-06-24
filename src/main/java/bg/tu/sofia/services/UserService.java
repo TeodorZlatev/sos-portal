@@ -17,16 +17,12 @@ public interface UserService {
 	
 	public UserDto getPersonWithNightTaxes(int userId);
 	
-	public List<UserDto> getPeopleWithNightTaxes(int blockId, int pageNumber);
+	public List<UserDto> getPeopleWithNightTaxes(String blockId, int pageNumber);
 	
-	public List<UserDto> getPeopleWithNightTaxesByMarker(String marker, int blockId, int pageNumber);
+	public List<UserDto> getPeopleWithNightTaxesByMarker(String marker, String blockId, int pageNumber);
 	
-	public String getCountPeopleWithNightTaxes(int blockId, int pageNumber);
+	public String getCountPeopleWithNightTaxes(String blockId, int pageNumber);
 	
 	public User authenticateUser(String personalNumber, String password) throws Exception;
-
-	public List<UserDto> getPeopleWithNightTaxes(int pageNumber);
-
-	public String getCountPeopleWithNightTaxes(int pageNumber);
 
 }

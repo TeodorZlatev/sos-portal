@@ -19,6 +19,11 @@ public class DateUtil {
 	private final SimpleDateFormat sdfWithTime = new SimpleDateFormat(dateFormatWithTime);
 	
 	public Date convertFromStringToDate(String dateStr) {
+
+		if (dateStr == null) {
+			return null;
+		}
+		
 		Date date = null;
 		try {
 			date = sdf.parse(dateStr);
@@ -29,11 +34,11 @@ public class DateUtil {
 	}
 
 	public String convertFromDateToString(Date date) {
-		return sdf.format(date);
+		return date != null ? sdf.format(date) : null;
 	}
 	
 	public String convertFromDateWithTimeToString(Date date) {
-		return sdfWithTime.format(date);
+		return date != null ? sdfWithTime.format(date) : null;
 	}
 
 }
