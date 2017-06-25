@@ -12,7 +12,7 @@ window.onload = function() {
 		} else if (role === "ROLE_HOST") {
 			createDivCreateNightTax();
 		} else {
-			createDivInsertUser();
+			createDivInsertUserByAdmin();
 		}
 	}
 }
@@ -118,8 +118,8 @@ function createHeader() {
 			createDivPeopleWithNightTaxes(role)
 		}, "Хора с нощувки", "left item");
 
-		createHeaderHelper(menu, createDivInsertInhabitant,
-				"Вписване на живущ", "left item");
+		createHeaderHelper(menu, createDivInsertUser, "Вписване на живущ",
+				"left item");
 		return;
 	}
 
@@ -131,8 +131,8 @@ function createHeader() {
 	}
 
 	if (role === "ROLE_ADMINISTRATOR") {
-		createHeaderHelper(menu, createDivInsertUser, "Вписване на потребител",
-				"left item");
+		createHeaderHelper(menu, createDivInsertUserByAdmin,
+				"Вписване на потребител", "left item");
 
 		createHeaderHelper(menu, function() {
 			createDivPeopleWithNightTaxes(role)
@@ -193,7 +193,7 @@ function showMessage(responseData) {
 }
 
 // INSERT USER
-function createDivInsertUser() {
+function createDivInsertUserByAdmin() {
 	document.title = "Записване на потребител";
 
 	var mainDiv = document.getElementById("mainDiv");
@@ -215,7 +215,7 @@ function createDivInsertUser() {
 	var tdNamesInput = createElement(trNames, "td");
 	createElement(tdNamesInput, "input", null, null, [ {
 		name : "id",
-		value : "user"
+		value : "username"
 	} ]);
 
 	var trPersonalNumber = createElement(table, "tr");
@@ -246,12 +246,13 @@ function createDivInsertUser() {
 	} ], expand);
 
 	loadRoles();
+
+	expand();
 }
 
 function loadRoles() {
 	var select = document.getElementById("roles");
 
-	select.appendChild(loadRolesHelper(" ", 0));
 	select.appendChild(loadRolesHelper("Живущ", "INHABITANT"));
 	select.appendChild(loadRolesHelper("Домакин", "HOST"));
 	select.appendChild(loadRolesHelper("Касиер", "CASHIER"));
@@ -269,17 +270,11 @@ function loadRolesHelper(roleName, role) {
 function expand() {
 	var role = document.getElementById("roles").value;
 
-	if (role === "0") {
-
-	} else if (role === "INHABITANT" || role === "HOST") {
-		insertInhabitantOrHostHelper();
+	if (role === "INHABITANT" || role === "HOST") {
+		loadBlocks();
 	} else if (role === "CASHIER" || role === "ADMINISTRATOR") {
 		insertCashierOrAdministratorHelper();
 	}
-}
-
-function insertInhabitantOrHostHelper() {
-	loadBlocks();
 }
 
 function loadBlocks() {
@@ -311,7 +306,7 @@ function loadBlocks() {
 			option.value = blocks[i].id;
 			select.appendChild(option);
 		}
-	}, "GET", "/sos-portal/blocks");
+	}, "GET", "/sos-portal/api/blocks");
 }
 
 function clearTableInsertUser() {
@@ -356,13 +351,7 @@ function completeInhabitedOrHostInsertion() {
 				value : "rooms"
 			} ]);
 
-			createElement(mainDiv, "button", "Запази", function() {
-				if (document.getElementById("roles").value === "INHABITANT") {
-					console.log("inhabited");
-				} else {
-					console.log("host");
-				}
-			}, [ {
+			createElement(mainDiv, "button", "Запази", insertUser, [ {
 				name : "id",
 				value : "saveButton"
 			} ]);
@@ -371,13 +360,7 @@ function completeInhabitedOrHostInsertion() {
 		loadRoomsByBlock(this.options[this.selectedIndex].value);
 	} else {
 		if (!document.getElementById("saveButton")) {
-			createElement(mainDiv, "button", "Запази", function() {
-				if (document.getElementById("roles").value === "INHABITANT") {
-					console.log("inhabited");
-				} else {
-					console.log("host");
-				}
-			}, [ {
+			createElement(mainDiv, "button", "Запази", insertUser, [ {
 				name : "id",
 				value : "saveButton"
 			} ]);
@@ -388,11 +371,17 @@ function completeInhabitedOrHostInsertion() {
 function insertCashierOrAdministratorHelper() {
 	clearTableInsertUser();
 
-	console.log("cashier");
+	var mainDiv = document.getElementById("mainDiv");
+	if (!document.getElementById("saveButton")) {
+		createElement(mainDiv, "button", "Запази", insertUser, [ {
+			name : "id",
+			value : "saveButton"
+		} ]);
+	}
 }
 
-// INSERT INHABITANT
-function createDivInsertInhabitant() {
+// INSERT USER
+function createDivInsertUser() {
 	document.title = "Записване на живущ";
 
 	var mainDiv = document.getElementById("mainDiv");
@@ -402,7 +391,7 @@ function createDivInsertInhabitant() {
 
 	var table = createElement(mainDiv, "table", null, null, [ {
 		name : "id",
-		value : "tableInsertInhabitant"
+		value : "tableInsertUser"
 	}, {
 		name : "class",
 		value : "center"
@@ -414,7 +403,7 @@ function createDivInsertInhabitant() {
 	var tdNamesInput = createElement(trNames, "td");
 	createElement(tdNamesInput, "input", null, null, [ {
 		name : "id",
-		value : "inhabited"
+		value : "username"
 	} ]);
 
 	var trPersonalNumber = createElement(table, "tr");
@@ -446,22 +435,46 @@ function createDivInsertInhabitant() {
 
 	loadRoomsByBlock();
 
-	createElement(mainDiv, "button", "Запази", insertInhabitant);
+	createElement(mainDiv, "button", "Запази", insertUser);
 }
 
-function insertInhabitant() {
+function insertUser() {
 
-	var inhabited = document.getElementById("inhabited").value;
+	var username = document.getElementById("username").value;
 	var personalNumber = document.getElementById("personalNumber").value;
 	var email = document.getElementById("email").value;
+	var roles = document.getElementById("roles");
+	var roleId;
+	if (roles) {
+		var roleValue = roles.options[roles.selectedIndex].value;
+		if (roleValue === "INHABITANT") {
+			roleId = "1";
+		} else if (roleValue === "HOST") {
+			roleId = "2";
+		} else if (roleValue === "CASHIER") {
+			roleId = "3";
+		} else if (roleValue === "ADMINISTRATOR") {
+			roleId = "4";
+		}
+	}
+	var blocks = document.getElementById("blocks");
+	var blockId;
+	if (blocks) {
+		blockId = blocks.options[blocks.selectedIndex].value;
+	}
 	var rooms = document.getElementById("rooms");
-	var roomId = rooms.options[rooms.selectedIndex].value;
+	var roomId;
+	if (rooms) {
+		roomId = rooms.options[rooms.selectedIndex].value;
+	}
 
 	var data = JSON.stringify({
-		"username" : inhabited,
+		"username" : username,
 		"personalNumber" : personalNumber,
 		"email" : email,
 		"roomId" : roomId,
+		"blockId" : blockId,
+		"roleId" : roleId
 	});
 
 	requestHeader = [ {
@@ -475,10 +488,16 @@ function insertInhabitant() {
 	createAjaxRequest(function(responseText) {
 		var result = showMessage(responseText);
 
+		var role = localStorage.getItem("role");
+
 		if (result === "SUCCESS") {
-			createDivInsertInhabitant();
+			if (role === "ROLE_HOST") {
+				createDivInsertUser();
+			} else if (role === "ROLE_ADMINISTRATOR") {
+				createDivInsertUserByAdmin();
+			}
 		}
-	}, "POST", "/sos-portal/inhabitant", data, requestHeader);
+	}, "POST", "/sos-portal/api/user", data, requestHeader);
 
 }
 
@@ -582,7 +601,7 @@ function createDivCreateNightTax() {
 				option.value = blocks[i].id;
 				select.appendChild(option);
 			}
-		}, "GET", "/sos-portal/blocks");
+		}, "GET", "/sos-portal/api/blocks");
 	}
 
 }
@@ -612,7 +631,7 @@ function loadRoomsByBlock(blockId) {
 			option.value = rooms[i].id;
 			select.appendChild(option);
 		}
-	}, "GET", "/sos-portal/rooms?blockId=" + currentBlockId);
+	}, "GET", "/sos-portal/api/rooms?blockId=" + currentBlockId);
 }
 
 function expandHosts(blockId) {
@@ -640,7 +659,7 @@ function expandHosts(blockId) {
 			completeDivCreateNightTax(hostsJSON);
 		}
 
-	}, "GET", "/sos-portal/hosts?roomId=" + roomId + "&blockId="
+	}, "GET", "/sos-portal/api/hosts?roomId=" + roomId + "&blockId="
 			+ currentBlockId);
 }
 
@@ -701,12 +720,14 @@ function createNightTax() {
 	var roomId = rooms.options[rooms.selectedIndex].value;
 	var host = document.getElementById("hosts").value;
 	var date = document.getElementById("date").value;
+	var creatorId = localStorage.getItem("userId");
 
 	var data = JSON.stringify({
 		"guestName" : guest,
 		"roomId" : roomId,
 		"hostId" : host,
-		"date" : date
+		"date" : date,
+		"creatorId": creatorId
 	});
 
 	requestHeader = [ {
@@ -723,7 +744,7 @@ function createNightTax() {
 		if (result === "SUCCESS") {
 			createDivCreateNightTax();
 		}
-	}, "POST", "/sos-portal/nightTax", data, requestHeader);
+	}, "POST", "/sos-portal/api/nightTax", data, requestHeader);
 
 }
 
@@ -841,7 +862,7 @@ function fetchPeopleWithNightTaxes(blockId, userId, pageNumber) {
 						peopleWithNightTaxesTable.appendChild(tbody);
 					}
 
-				}, "GET", "/sos-portal/userNightTaxes?userId=" + userId);
+				}, "GET", "/sos-portal/api/userNightTaxes?userId=" + userId);
 	} else if (blockId) {
 		createAjaxRequest(function(responseText) {
 			var people = JSON.parse(responseText);
@@ -856,7 +877,7 @@ function fetchPeopleWithNightTaxes(blockId, userId, pageNumber) {
 				fetchPeopleWithNightTaxesAboutPagination(blockId, pageNumber);
 			}
 
-		}, "GET", "/sos-portal/usersNightTaxes?blockId=" + blockId
+		}, "GET", "/sos-portal/api/usersNightTaxes?blockId=" + blockId
 				+ "&pageNumber=" + pageNumber);
 	} else {
 		createAjaxRequest(function(responseText) {
@@ -872,7 +893,7 @@ function fetchPeopleWithNightTaxes(blockId, userId, pageNumber) {
 				fetchPeopleWithNightTaxesAboutPagination(null, pageNumber);
 			}
 
-		}, "GET", "/sos-portal/usersNightTaxes?pageNumber=" + pageNumber);
+		}, "GET", "/sos-portal/api/usersNightTaxes?pageNumber=" + pageNumber);
 	}
 
 }
@@ -882,10 +903,10 @@ function fetchPeopleWithNightTaxesAboutPagination(blockId, pageNumber) {
 	var url;
 
 	if (blockId) {
-		url = "/sos-portal/usersNightTaxesCount?blockId=" + blockId
+		url = "/sos-portal/api/usersNightTaxesCount?blockId=" + blockId
 				+ "&pageNumber=" + pageNumber;
 	} else {
-		url = "/sos-portal/usersNightTaxesCount?pageNumber=" + pageNumber;
+		url = "/sos-portal/api/usersNightTaxesCount?pageNumber=" + pageNumber;
 	}
 
 	createAjaxRequest(function(responseText) {
@@ -1025,10 +1046,10 @@ function searchPeople() {
 	var role = localStorage.getItem("role");
 
 	if (role === "ROLE_HOST") {
-		url = "/sos-portal/search?marker=" + marker + "&blockId=" + blockId
+		url = "/sos-portal/api/search?marker=" + marker + "&blockId=" + blockId
 				+ "&pageNumber=" + 1;
 	} else if (role === "ROLE_CASHIER" || role === "ROLE_ADMINISTRATOR") {
-		url = "/sos-portal/search?marker=" + marker + "&pageNumber=" + 1;
+		url = "/sos-portal/api/search?marker=" + marker + "&pageNumber=" + 1;
 	}
 
 	createAjaxRequest(
@@ -1140,6 +1161,12 @@ function createDivNightTaxesPerPerson(status) {
 		createElement(tr, "th", "Дата на плащане");
 	}
 
+	if (role === "ROLE_CASHIER" || role === "ROLE_ADMINISTRATOR") {
+		if (status === "UNPAID") {
+			createElement(tr, "th", "Плащане");
+		}
+	}
+
 	createElement(table, "tbody");
 
 	createElement(mainDiv, "div", null, null, [ {
@@ -1163,13 +1190,13 @@ function fetchNightTaxesPerPerson(userId, status, pageNumber) {
 
 				} else {
 
-					fillInNightTaxesPerPersonTable(nightTaxes);
+					fillInNightTaxesPerPersonTable(nightTaxes, userId);
 
 					fetchNightTaxesPerPersonAboutPagination(userId, status,
 							pageNumber);
 				}
 
-			}, "GET", "/sos-portal/nightTaxesPerUser?userId=" + userId
+			}, "GET", "/sos-portal/api/nightTaxesPerUser?userId=" + userId
 					+ "&status=" + status + "&pageNumber=" + pageNumber);
 
 }
@@ -1207,7 +1234,7 @@ function fetchNightTaxesPerPersonAboutPagination(userId, status, pageNumber) {
 			div.appendChild(createAHrefForNightTaxes(userId, status,
 					paginatorData.lastPage, "&raquo;"));
 		}
-	}, "GET", "/sos-portal/nightTaxesPerUserCount?userId=" + userId
+	}, "GET", "/sos-portal/api/nightTaxesPerUserCount?userId=" + userId
 			+ "&status=" + status + "&pageNumber=" + pageNumber);
 
 }
@@ -1227,7 +1254,7 @@ function createAHrefForNightTaxes(userId, status, pageNumber, innerHTML, active)
 	return a;
 }
 
-function fillInNightTaxesPerPersonTable(nightTaxes) {
+function fillInNightTaxesPerPersonTable(nightTaxes, userId) {
 	var role = localStorage.getItem("role");
 
 	var tbody = document.getElementById("nightTaxesTable").tBodies[0];
@@ -1294,8 +1321,111 @@ function fillInNightTaxesPerPersonTable(nightTaxes) {
 			tr.appendChild(tdDatePaid);
 		}
 
+		if (role === "ROLE_CASHIER" || role === "ROLE_ADMINISTRATOR") {
+			if (nightTaxes[index].status === "UNPAID") {
+				var tdPayment = document.createElement("td");
+				var checkBoxPayment = createElement(tdPayment, "input", null,
+						null, [ {
+							name : "type",
+							value : "checkbox"
+						}, {
+							name : "value",
+							value : nightTaxes[index].id
+						} ]);
+				tr.appendChild(tdPayment);
+			}
+		}
+
 		tbody.appendChild(tr);
 	}
 
 	nightTaxesTable.appendChild(tbody);
+
+	if (role === "ROLE_CASHIER" || role === "ROLE_ADMINISTRATOR") {
+		if (nightTaxes[0].status === "UNPAID") {
+
+			if (!document.getElementById("tablePayAll")) {
+				var mainDiv = document.getElementById("mainDiv");
+
+				var tablePayAll = createElement(mainDiv, "table", null, null, [
+						{
+							name : "id",
+							value : "tablePayAll"
+						}, {
+							name : "class",
+							value : "modified rightAligned"
+						} ]);
+
+				var trAll = createElement(tablePayAll, "tr");
+
+				var tdAllOutput = createElement(trAll, "td");
+				createElement(tdAllOutput, "output", "Всички: ");
+
+				var tdPaymentAll = createElement(trAll, "td");
+				var checkBoxPayment = createElement(tdPaymentAll, "input",
+						null, null, [ {
+							name : "id",
+							value : "checkBoxPayment"
+						}, {
+							name : "type",
+							value : "checkbox"
+						} ]);
+				checkBoxPayment.onchange = editAllCheckBoxes;
+
+				var trButton = createElement(tablePayAll, "tr");
+				var tdButtonPaymentAll = createElement(trButton, "td");
+				var buttonPayment = createElement(tdButtonPaymentAll, "button",
+						"Плащане", function() {
+							payNightTaxes(userId)
+						});
+			}
+		}
+	}
+}
+
+function editAllCheckBoxes() {
+	var checkBoxPayment = document.getElementById("checkBoxPayment");
+	var flag = false;
+	if (checkBoxPayment.checked) {
+		flag = true;
+	}
+
+	var tbody = document.getElementById("nightTaxesTable").tBodies[0];
+	for (var i = 0, row; row = tbody.rows[i]; i++) {
+		var checkbox = row.cells[row.cells.length - 1].childNodes[0];
+		checkbox.checked = flag;
+	}
+}
+
+function payNightTaxes(userId) {
+	var tbody = document.getElementById("nightTaxesTable").tBodies[0];
+
+	var ids = new Array(tbody.rows.length);
+
+	for (var i = 0, row; row = tbody.rows[i]; i++) {
+		var checkbox = row.cells[row.cells.length - 1].childNodes[0];
+
+		if (checkbox.checked) {
+			ids[i] = {
+				id : checkbox.value
+			};
+		}
+	}
+
+	var data = JSON.stringify(ids);
+	console.log(data);
+
+	requestHeader = [ {
+		header : "Accept",
+		value : "application/json"
+	}, {
+		header : "Content-type",
+		value : "application/json"
+	} ]
+
+	createAjaxRequest(function(responseText) {
+		showMessage(responseText);
+
+		fetchNightTaxesPerPerson(userId, "UNPAID", 1)
+	}, "POST", "/sos-portal/api/payNightTaxes", data, requestHeader);
 }

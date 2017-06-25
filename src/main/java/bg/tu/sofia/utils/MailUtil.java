@@ -25,16 +25,28 @@ public class MailUtil {
 		this.mailSender.send(msg);
 	}
 
-	public void sendMailForRegistration(UserDto inhabited, String room) {
+	public void sendMailForRegistration(UserDto inhabited, String role, String room, String block) {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Здравейте, " + inhabited.getUsername()
+				+ ",\n\n успешно ви бе създадена регистрация в портала на СОС ( http://localhost:8080/sos-portal ). \n\nЛични данни:\nЕГН: "
+				+ inhabited.getPersonalNumber() + "\nEmail: " + inhabited.getEmail() + "\nСтатус: " + role);
+		if (room != null) {
+			sb.append("\nСтая: " + room);
+		}
+
+		if (block != null) {
+			sb.append("\nБлок: " + block);
+		}
+
+		sb.append("\n\nСтудентски общежития и столове, ТУ - София");
 
 		SimpleMailMessage msg = new SimpleMailMessage();
 
 		msg.setSubject("Регистрация в портал на СОС");
 		msg.setTo(inhabited.getEmail());
-		msg.setText("Здравейте, " + inhabited.getUsername()
-				+ ",\n\n успешно ви бе създадена регистрация в портала на СОС ( http://localhost:8080/sos-portal ). \n\nЛични данни:\nЕГН: "
-				+ inhabited.getPersonalNumber() + "\nEmail: " + inhabited.getEmail() + "\nСтая: " + room
-				+ "\n\nСтудентски общежития и столове, ТУ - София");
+		msg.setText(sb.toString());
 
 		this.mailSender.send(msg);
 	}

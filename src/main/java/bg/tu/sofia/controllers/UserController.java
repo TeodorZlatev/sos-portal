@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,8 +22,9 @@ public class UserController {
 	private UserService userService;
 	
 	@RequestMapping(method = RequestMethod.GET,
-					value = "/hosts",
+					value = "/api/hosts",
 					produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('HOST','ADMINISTRATOR')")
 	public List<UserDto> getHostsByRoomIdAndBlockId(@RequestParam int roomId, @RequestParam int blockId) {
 		List<UserDto> hosts = userService.getAllByRoomIdAndBlockId(roomId, blockId);
 		return hosts;
@@ -30,41 +32,46 @@ public class UserController {
 	
 	
 	@RequestMapping(method = RequestMethod.POST,
-					value = "/inhabitant",
+					value = "/api/user",
 					produces = MediaType.APPLICATION_JSON_VALUE,
 					consumes = MediaType.APPLICATION_JSON_VALUE)
-	public StructuredResponse insertInhabitant(@RequestBody UserDto user) {
-		return userService.insertInhabitant(user);
+	@PreAuthorize("hasAnyRole('HOST','ADMINISTRATOR')")
+	public StructuredResponse insertUser(@RequestBody UserDto user) {
+		return userService.insertUser(user);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/userNightTaxes",
+			value = "/api/userNightTaxes",
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('INHABITED')")
 	public UserDto getPersonWithNightTaxes(@RequestParam int userId) {
 		return userService.getPersonWithNightTaxes(userId);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/usersNightTaxes",
+			value = "/api/usersNightTaxes",
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('HOST','CASHIER','ADMINISTRATOR')")
 	public List<UserDto> getPeopleWithNightTaxes(@RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
 		return userService.getPeopleWithNightTaxes(blockId, pageNumber);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/usersNightTaxesCount",
+			value = "/api/usersNightTaxesCount",
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('HOST','CASHIER','ADMINISTRATOR')")
 	public String getPeopleWithNightTaxesCount(@RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
 		return userService.getCountPeopleWithNightTaxes(blockId, pageNumber);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/search",
+			value = "/api/search",
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('HOST','CASHIER','ADMINISTRATOR')")
 	public List<UserDto> searchByMarker(@RequestParam String marker, @RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
 		return userService.getPeopleWithNightTaxesByMarker(marker, blockId, pageNumber);
 	}

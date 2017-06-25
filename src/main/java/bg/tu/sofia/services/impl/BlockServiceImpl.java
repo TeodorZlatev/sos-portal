@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import bg.tu.sofia.dtos.BlockDto;
 import bg.tu.sofia.entities.Block;
+import bg.tu.sofia.entities.User;
 import bg.tu.sofia.repositories.BlockRepository;
 import bg.tu.sofia.services.BlockService;
 
@@ -18,7 +19,7 @@ public class BlockServiceImpl implements BlockService {
 	private BlockRepository blockRepository;
 
 	@Override
-	public BlockDto getBlockIdById(int blockId) {
+	public BlockDto getBlockById(int blockId) {
 		return fromEntity(blockRepository.findOne(blockId));
 	}
 
@@ -32,6 +33,11 @@ public class BlockServiceImpl implements BlockService {
 		List<Block> blocks = blockRepository.findAll();
 		return blocks.stream().map(this::fromEntity).collect(Collectors.toList());
 	}
+	
+	@Override
+	public void saveOrUpdateBlock(BlockDto blockDto) {
+		this.blockRepository.save(this.toEntity(blockDto));
+	}
 
 	private BlockDto fromEntity(Block block) {
 		BlockDto blockDto = new BlockDto();
@@ -42,5 +48,22 @@ public class BlockServiceImpl implements BlockService {
 
 		return blockDto;
 	}
+	
+	private Block toEntity(BlockDto blockDto) {
+		Block block = new Block();
+		
+		block.setId(blockDto.getId());
+		block.setNumber(blockDto.getNumber());
+		
+		User host = new User();
+		host.setId(blockDto.getHostId());
+		
+		block.setHost(host);
+		
+		return block;
+		
+	}
+
+	
 
 }

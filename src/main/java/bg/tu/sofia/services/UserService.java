@@ -13,7 +13,7 @@ public interface UserService {
 
 	public List<UserDto> getAllByRoomIdAndBlockId(int roomId, int blockId);
 
-	public StructuredResponse insertInhabitant(UserDto user);
+	public StructuredResponse insertUser(UserDto user);
 	
 	public UserDto getPersonWithNightTaxes(int userId);
 	

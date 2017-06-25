@@ -18,7 +18,7 @@ public class BlockController {
 	private BlockService blockService;
 
 	@RequestMapping(method = RequestMethod.GET, 
-					value = "/blocks",
+					value = "/api/blocks",
 					produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<BlockDto> getBlocks() {
 		return blockService.getAllBlocks();

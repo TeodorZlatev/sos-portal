@@ -51,10 +51,16 @@ li {
 	font-style: italic;
 	padding: 19px 16px;
 	text-decoration: none;
+	cursor: pointer;
 }
 
 .item a:hover {
 	color: green;
+}
+
+.mainDiv {
+	width: 70%;
+	margin: 0px auto;
 }
 
 .frame {
@@ -120,14 +126,12 @@ table.center td:last-child {
 }
 
 table.modified {
-	width: 70%;
 	margin-top: 10px;
 	margin-bottom: 10px;
 	margin-left: auto;
 	margin-right: auto;
 	border-collapse: separate;
 	border-spacing: 0;
-	margin-bottom: 10px;
 }
 
 table.modified th {
@@ -169,6 +173,15 @@ table.modified tr:nth-child(odd) td {
 	background: #eaeaed;
 }
 
+table.rightAligned {
+	margin-right: 0px;
+	float: right;
+}
+
+table.rightAligned td {
+	border-top: 1px solid #c6c9cc;
+}
+
 .pagination {
 	width: 20%;
 	margin: auto;
@@ -189,7 +202,7 @@ table.modified tr:nth-child(odd) td {
 	border-radius: 5px;
 }
 
-.pagination a:hover:not(.active) {
+.pagination a:hover:not (.active ) {
 	background-color: lightgrey;
 	border-radius: 5px;
 }

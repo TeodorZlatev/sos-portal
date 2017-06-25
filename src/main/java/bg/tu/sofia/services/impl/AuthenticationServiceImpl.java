@@ -8,6 +8,7 @@ import bg.tu.sofia.dtos.RoomDto;
 import bg.tu.sofia.entities.User;
 import bg.tu.sofia.security.transfer.JwtUserDto;
 import bg.tu.sofia.security.util.JwtTokenGenerator;
+import bg.tu.sofia.security.util.TextHasher;
 import bg.tu.sofia.services.AuthenticationService;
 import bg.tu.sofia.services.BlockService;
 import bg.tu.sofia.services.RoomService;
@@ -29,11 +30,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Autowired
 	private JwtTokenGenerator jwtTokenGenerator;
+	
+	@Autowired
+	private TextHasher textHasher;	
 
 	@Override
 	public StructuredResponse authenticate(String personalNumber, String password) {
 		try {
-			User user = this.userService.authenticateUser(personalNumber, password);
+			String hashedPassword = textHasher.get_SHA_512_SecurePassword(password, Constants.SALT);
+			
+			User user = this.userService.authenticateUser(personalNumber, hashedPassword);
 
 			if (user != null) {
 

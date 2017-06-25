@@ -37,7 +37,7 @@ public class NightTaxServiceImpl implements NightTaxService {
 
 	@Autowired
 	private RoomService roomService;
-	
+
 	@Autowired
 	private BlockService blockService;
 
@@ -66,7 +66,7 @@ public class NightTaxServiceImpl implements NightTaxService {
 		if (nightTaxDto.getRoomId() == null || !nightTaxDto.getRoomId().matches("[0-9]+[А-Яа-яA-Za-z]*")) {
 			sb.append("Невалиден избор на стая!</br>");
 		}
-		
+
 		if (nightTaxDto.getHostId() == 0) {
 			sb.append("Невалиден избор на домакин!</br>");
 		}
@@ -126,20 +126,41 @@ public class NightTaxServiceImpl implements NightTaxService {
 		return pageUtil.createPagination(pageNumber, pagesCount);
 	}
 
+	@Override
+	public StructuredResponse payNightTaxes(List<NightTaxDto> nightTaxes) {
+		// extract ids from not null dtos
+		List<Integer> ids = nightTaxes.stream().
+				filter(nightTax -> nightTax != null).
+				map(nightTax -> nightTax.getId())
+				.collect(Collectors.toList());
+
+		
+		String message = null;
+		if (ids.size() == 1) {
+			message = "Заплатена е " + ids.size() + " нощувка.";
+		} else {
+			message = "Заплатени са " + ids.size() + " нощувки.";
+		}
+		
+		nightTaxRepository.payNightTaxes(new Date(), ids);
+
+		return new StructuredResponse(200, RESPONSE_STATUS.SUCCESS, null, message);
+	}
+
 	private NightTax toEntity(NightTaxDto nightTaxDto) {
 		NightTax nightTax = new NightTax();
 
 		User host = userRepository.findOne(nightTaxDto.getHostId());
 
 		nightTax.setHost(host);
-		
+
 		Room room = new Room();
 		room.setId(Integer.parseInt(nightTaxDto.getRoomId()));
-		
+
 		nightTax.setRoom(room);
 		nightTax.setGuestName(nightTaxDto.getGuestName());
 		nightTax.setDate(dateUtil.convertFromStringToDate(nightTaxDto.getDate()));
-		nightTax.setCreator(userRepository.findOne(1));
+		nightTax.setCreator(userRepository.findOne(nightTaxDto.getCreatorId()));
 		nightTax.setStatus(NightTaxStatusEnum.UNPAID);
 		nightTax.setDateCreated(new Date());
 
@@ -149,16 +170,18 @@ public class NightTaxServiceImpl implements NightTaxService {
 	private NightTaxDto fromEntity(NightTax nightTax) {
 		NightTaxDto nightTaxDto = new NightTaxDto();
 
+		nightTaxDto.setId(nightTax.getId());
+
 		RoomDto room = roomService.getByRoomId(nightTax.getRoom().getId());
-		
+
 		nightTaxDto.setRoomId(room.getId() + "");
 		nightTaxDto.setRoomNumber(room.getNumber());
-		
-		BlockDto block = blockService.getBlockIdById(room.getBlockId());
-		
+
+		BlockDto block = blockService.getBlockById(room.getBlockId());
+
 		nightTaxDto.setBlockId(block.getId());
 		nightTaxDto.setBlockNumber(block.getNumber());
-		
+
 		nightTaxDto.setStatus(nightTax.getStatus());
 		nightTaxDto.setDate(dateUtil.convertFromDateToString(nightTax.getDate()));
 		nightTaxDto.setHostName(userRepository.findOne(nightTax.getHost().getId()).getUsername());
@@ -166,7 +189,7 @@ public class NightTaxServiceImpl implements NightTaxService {
 		nightTaxDto.setCreatorName(userRepository.findOne(nightTax.getCreator().getId()).getUsername());
 		nightTaxDto.setDateCreated(dateUtil.convertFromDateWithTimeToString(nightTax.getDateCreated()));
 		nightTaxDto.setDatePaid(dateUtil.convertFromDateWithTimeToString(nightTax.getDatePaid()));
-		
+
 		return nightTaxDto;
 	}
 

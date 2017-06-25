@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,17 +24,19 @@ public class NightTaxController {
 
 	@RequestMapping(
 			method = RequestMethod.POST, 
-			value = "/nightTax", 
+			value = "/api/nightTax", 
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('HOST','ADMINISTRATOR')")
 	public StructuredResponse createNightTax(@RequestBody NightTaxDto nightTax) {
 		return nightTaxService.createNightTax(nightTax);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/nightTaxesPerUser",
+			value = "/api/nightTaxesPerUser",
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	// all roles
 	public List<NightTaxDto> getPeopleWithNightTaxes(@RequestParam(name = "userId") int userId,
 			@RequestParam(name = "status") NightTaxStatusEnum status,
 			@RequestParam(name = "pageNumber") int pageNumber) {
@@ -42,12 +45,25 @@ public class NightTaxController {
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/nightTaxesPerUserCount",
+			value = "/api/nightTaxesPerUserCount",
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	// all roles
 	public String getNightTaxesCount(@RequestParam(name = "userId") int userId,
 			@RequestParam(name = "status") NightTaxStatusEnum status,
 			@RequestParam(name = "pageNumber") int pageNumber) {
 		return nightTaxService.getCountNightTaxes(userId, status, pageNumber);
 	}
+	
+	@RequestMapping(
+			method = RequestMethod.POST,
+			value = "/api/payNightTaxes",
+			produces = MediaType.APPLICATION_JSON_VALUE,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('CASHIER','ADMINISTRATOR')")
+	public StructuredResponse payNightTaxes(@RequestBody List<NightTaxDto> nightTaxes) {
+		return nightTaxService.payNightTaxes(nightTaxes);
+	}
+	
+	
 	
 }

@@ -3,6 +3,7 @@ package bg.tu.sofia.dtos;
 import bg.tu.sofia.constants.NightTaxStatusEnum;
 
 public class NightTaxDto {
+	private int id;
 	private String guestName;
 	private int blockId;
 	private String blockNumber;
@@ -12,9 +13,18 @@ public class NightTaxDto {
 	private String hostName;
 	private String date;
 	private String dateCreated;
+	private int creatorId;
 	private String creatorName;
 	private NightTaxStatusEnum status;
 	private String datePaid;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getGuestName() {
 		return guestName;
@@ -86,6 +96,14 @@ public class NightTaxDto {
 
 	public void setDateCreated(String dateCreated) {
 		this.dateCreated = dateCreated;
+	}
+
+	public int getCreatorId() {
+		return creatorId;
+	}
+
+	public void setCreatorId(int creatorId) {
+		this.creatorId = creatorId;
 	}
 
 	public String getCreatorName() {

@@ -12,4 +12,6 @@ public interface NightTaxService {
 	public List<NightTaxDto> getNightTaxesOfUser(int userId, NightTaxStatusEnum status, int pageNumber);
 	
 	public String getCountNightTaxes(int userId, NightTaxStatusEnum status, int pageNumber);
+
+	public StructuredResponse payNightTaxes(List<NightTaxDto> nightTaxes);
 }

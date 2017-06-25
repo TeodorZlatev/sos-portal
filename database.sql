@@ -25,9 +25,11 @@ DROP TABLE IF EXISTS `block`;
 CREATE TABLE `block` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `number` varchar(45) NOT NULL,
-  `host_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `host_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `host_block_idx` (`host_id`),
+  CONSTRAINT `host_block` FOREIGN KEY (`host_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -36,7 +38,7 @@ CREATE TABLE `block` (
 
 LOCK TABLES `block` WRITE;
 /*!40000 ALTER TABLE `block` DISABLE KEYS */;
-INSERT INTO `block` VALUES (1,'2',1),(2,'3',9);
+INSERT INTO `block` VALUES (1,'2',3),(2,'3',6),(3,'4',7),(4,'51А',8);
 /*!40000 ALTER TABLE `block` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -50,9 +52,11 @@ DROP TABLE IF EXISTS `credentials`;
 CREATE TABLE `credentials` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
-  `password` varchar(45) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+  `password` varchar(129) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_credentials_idx` (`user_id`),
+  CONSTRAINT `user_credentials` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -61,7 +65,7 @@ CREATE TABLE `credentials` (
 
 LOCK TABLES `credentials` WRITE;
 /*!40000 ALTER TABLE `credentials` DISABLE KEYS */;
-INSERT INTO `credentials` VALUES (1,2,'1'),(2,1,'2'),(3,11,'3'),(4,10,'4'),(5,8,'12'),(6,5,'12345'),(7,9,'1231231230');
+INSERT INTO `credentials` VALUES (1,1,'5aa62787f3302adb183911b7a7c9e61e3569706e806973ac0cfcafe5b8b49cd8ec5a523c91dd1c0f1e06fd7888ed4c5fab1462dd60a3c4f8e078e721757fe07c'),(2,2,'0ede7934a345eadfa811fb5e7fe42202631641f2dfc35772da213214ce11f3dc7136e2344b990d8cfe6908c4c04fda35d24e6d5e4782b2f96e4fd5ab48cb50ba'),(3,3,'3d1a7f4b9da8a0f40c7c6d738c5da75bdb011a98afb6abc7ca0bacf4cd058e8dad0c7d1c0de74b2846ef5bbadd8a3060a129fa2768002f8b5bcff641b0ed2ffa'),(4,4,'1185c62cb95556c7417ba47a00878d125deb39f7a46da0c3b32b453581b4110a8d5a47caf50fe5ad355110a62beaef4e52af512d3b68c8ac9c32ed1d63320cd2'),(5,5,'84de751752fce7babdebe358d97b9c538c8958cac88398d5d0716375ab73d4276d596a2f099c6379f2a43922b2195bf6ef7014d9769a0da6b84a83982d5133a2'),(6,6,'578422d35c3a058bc641936d1283c896c5745a48aae426bb85d364727f8f43a3ff979deef95c99fe4a11b16abfebe761102de69e5c10db041d40e8747dda0cb2'),(7,7,'2b9099ae19555e7b4618b628345934b75b62c85636cb174f22c91157e5ae3147c767c6ebd66c5367a9b7e89f54cad6fb18dc7897b342a5971f8cf2f1ea9df7fc'),(8,8,'daac5764ee868e7fc4f7f7128d48e9252033e00fabbfe119870b06037687931be91c396d492109304c025a279bd6440f686b24ba17656b0e311e4b9d90afe696'),(9,9,'efa2daaed0e83a958720513e763203829cc81111b0a35e72d5cb4b8fbcaa9c0c0623019364d2760ee26ec4402ee25fb72132ca9e16873fc5a724472315589621');
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -82,8 +86,14 @@ CREATE TABLE `night_tax` (
   `status` varchar(45) NOT NULL,
   `date_paid` varchar(45) DEFAULT NULL,
   `date_created` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `user_idx` (`user_id`),
+  KEY `creator_idx` (`created_by`),
+  KEY `room_idx` (`room_id`),
+  CONSTRAINT `creator_nighttax` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `room_nighttax` FOREIGN KEY (`room_id`) REFERENCES `room` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `user_nighttax` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +102,7 @@ CREATE TABLE `night_tax` (
 
 LOCK TABLES `night_tax` WRITE;
 /*!40000 ALTER TABLE `night_tax` DISABLE KEYS */;
-INSERT INTO `night_tax` VALUES (1,2,1,'Виолина','2017-04-13 00:00:00',1,'PAID','2017-04-15 19:00:19','2017-04-14 19:10:19'),(2,2,1,'Виолина','2017-04-13 00:00:00',1,'UNPAID',NULL,'2017-04-14 19:00:30'),(3,2,1,'Виолина','2017-04-13 00:00:00',1,'UNPAID',NULL,'2017-04-14 19:00:42'),(4,4,3,'Иван','2017-11-11 00:00:00',1,'UNPAID',NULL,'2017-04-14 19:04:52'),(5,4,3,'Георги','2016-02-02 00:00:00',1,'UNPAID',NULL,'2017-04-14 19:46:45'),(6,3,1,'Миро','2017-04-13 00:00:00',1,'UNPAID',NULL,'2017-04-21 09:06:08'),(8,6,4,'Стоян','2017-05-17 00:00:00',1,'UNPAID',NULL,'2017-05-06 15:05:39'),(9,7,37,'Георги','2017-05-05 00:00:00',1,'UNPAID',NULL,'2017-05-06 23:07:33'),(20,3,1,'Стоян','2017-05-09 00:00:00',1,'UNPAID',NULL,'2017-05-07 17:45:11'),(21,2,1,'Виолина','2017-06-01 00:00:00',1,'UNPAID',NULL,'2017-06-04 10:40:30'),(22,2,1,'Виолина','2017-06-02 00:00:00',1,'UNPAID',NULL,'2017-06-04 10:43:02'),(23,2,1,'Виолина','2017-06-03 00:00:00',1,'UNPAID',NULL,'2017-06-04 10:45:23'),(24,2,1,'Виолина','2017-06-04 00:00:00',1,'UNPAID',NULL,'2017-06-04 10:48:33'),(25,2,1,'Виолина','2017-05-31 00:00:00',1,'UNPAID',NULL,'2017-06-04 10:53:24'),(26,3,1,'Мирослав','2017-06-01 00:00:00',1,'UNPAID',NULL,'2017-06-04 10:57:19'),(27,3,1,'Христиан','2017-06-02 00:00:00',1,'UNPAID',NULL,'2017-06-04 11:02:00'),(29,5,4,'Явор','2017-06-07 00:00:00',1,'PAID','2017-06-14 17:04:31','2017-06-11 17:04:31'),(30,12,23,'Стоян','2017-06-20 00:00:00',1,'UNPAID',NULL,'2017-06-21 22:41:07'),(31,8,5,'Стоян','2017-06-20 00:00:00',9,'UNPAID',NULL,'2017-06-21 22:41:07'),(32,3,1,'Мирослав Стратиев','2017-06-16 00:00:00',1,'UNPAID',NULL,'2017-06-24 01:54:58'),(33,4,3,'Венелин Иванов','2017-06-22 00:00:00',1,'UNPAID',NULL,'2017-06-24 02:49:52'),(34,8,5,'Иван Иванов','2017-06-13 00:00:00',1,'UNPAID',NULL,'2017-06-24 02:50:36');
+INSERT INTO `night_tax` VALUES (1,9,7,'Георги','2017-06-25 00:00:00',8,'UNPAID',NULL,'2017-06-25 18:02:28');
 /*!40000 ALTER TABLE `night_tax` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -131,8 +141,10 @@ CREATE TABLE `room` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `number` varchar(45) NOT NULL,
   `block_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `block_idx` (`block_id`),
+  CONSTRAINT `block_room` FOREIGN KEY (`block_id`) REFERENCES `block` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,7 +153,7 @@ CREATE TABLE `room` (
 
 LOCK TABLES `room` WRITE;
 /*!40000 ALTER TABLE `room` DISABLE KEYS */;
-INSERT INTO `room` VALUES (1,'229',1),(3,'701',1),(4,'105',1),(5,'105',2),(6,'200',1),(7,'201',1),(8,'202',1),(9,'203',1),(10,'204',1),(11,'205',1),(12,'206',1),(13,'207',1),(14,'208',1),(15,'209',1),(16,'210',1),(17,'211',1),(18,'212',1),(19,'213',1),(20,'214',1),(21,'215',1),(22,'216',1),(23,'217',1),(24,'218',1),(25,'219',1),(26,'220',1),(27,'221',1),(28,'222',1),(29,'223',1),(30,'224',1),(31,'225',1),(32,'226',1),(33,'227',1),(34,'228',1),(35,'230',1),(37,'710',1);
+INSERT INTO `room` VALUES (1,'229',1),(2,'105',1),(3,'701',1),(4,'301',2),(5,'305',2),(6,'602',2),(7,'405',4),(8,'525',4),(9,'526',4);
 /*!40000 ALTER TABLE `room` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -159,8 +171,10 @@ CREATE TABLE `user` (
   `email` varchar(45) NOT NULL,
   `role_id` int(11) NOT NULL,
   `activated` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `role_idx` (`role_id`),
+  CONSTRAINT `role_user` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -169,7 +183,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Любка','2','tee0@abv.bg',2,0),(2,'Теодор Златев','1','tee0@abv.bg',1,0),(3,'Йордан Калъчев','123','tee0@abv.bg',1,0),(4,'Пламен Койнов','1234','tee0@abv.bg',1,0),(5,'Борислав Петровски','12345','tee0@abv.bg',1,0),(6,'Златко Стоянов','123456','tee0@abv.bg',1,0),(7,'Петър Лазаров','1234567','tee0@abv.bg',1,0),(8,'иван','12','tee0@abv.bg',1,0),(9,'Стоян Иванов Иванов','1231231230','tee0@abv.bg',2,0),(10,'Админ','4','tee0@abv.bg',4,0),(11,'Касиер','3','tee0@abv.bg',3,0),(12,'Иван Иванов Иванов','2222222222','tee0@abv.bg',1,0),(13,'Тест ','9999999999','tee0@abv.bg',1,0);
+INSERT INTO `user` VALUES (1,'Администратор 1','4','tee0@abv.bg',4,0),(2,'Домакин блок 2','3','tee0@abv.bg',3,0),(3,'Касиер 1','2','tee0@abv.bg',2,0),(4,'Теодор Златев','1','tee0@abv.bg',1,0),(5,'Йордан Калъчев','9309011212','tee0@abv.bg',1,0),(6,'Домакин трети','1231231230','tee0@abv.bg',2,0),(7,'Домакин четвърти','1231231232','tee0@abv.bg',2,0),(8,'Домакин петЕдноА','5555555555','tee0@abv.bg',2,0),(9,'Стоян Стоянов','1231231239','tee0@abv.bg',1,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -184,8 +198,12 @@ CREATE TABLE `user_room` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `room_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `user_idx` (`user_id`),
+  KEY `room_idx` (`room_id`),
+  CONSTRAINT `room_userroom` FOREIGN KEY (`room_id`) REFERENCES `room` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `user_userroom` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -194,7 +212,7 @@ CREATE TABLE `user_room` (
 
 LOCK TABLES `user_room` WRITE;
 /*!40000 ALTER TABLE `user_room` DISABLE KEYS */;
-INSERT INTO `user_room` VALUES (1,2,1),(2,3,1),(3,4,3),(4,5,4),(5,6,4),(6,7,37),(7,8,5),(8,9,9),(9,12,23),(10,13,23);
+INSERT INTO `user_room` VALUES (1,4,1),(2,5,1),(3,9,7);
 /*!40000 ALTER TABLE `user_room` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -207,4 +225,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-24 14:13:10
+-- Dump completed on 2017-06-25 18:39:01
