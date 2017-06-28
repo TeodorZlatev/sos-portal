@@ -6,9 +6,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @NamedQueries({
@@ -31,7 +31,7 @@ public class User {
 	private String personalNumber;
 	@Column(name = "email")
 	private String email;
-	@ManyToOne
+	@OneToOne
 	@JoinColumn(name = "role_id")
 	private Role role;
 	@Column(name = "activated")

@@ -85,7 +85,9 @@ public class NightTaxServiceImpl implements NightTaxService {
 				nightTaxDto.getGuestName(), dateUtil.convertFromStringToDate(nightTaxDto.getDate()));
 
 		if (existingNightTaxes.size() > 0) {
-			sb.append("Текущата нощувка е въведена. Домакин: " + nightTaxDto.getHostName() + ", гост: "
+			User host = userRepository.findOne(nightTaxDto.getHostId());
+			
+			sb.append("Текущата нощувка е въведена. Домакин: " + host.getUsername() + ", гост: "
 					+ nightTaxDto.getGuestName() + ", дата: " + nightTaxDto.getDate());
 
 			return new StructuredResponse(409, RESPONSE_STATUS.FAIL, null, sb.toString());

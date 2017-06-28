@@ -13,5 +13,6 @@ public interface RoomRepository extends PagingAndSortingRepository<Room, Integer
 
 	public Room findByNumberAndBlockId(String roomNumber, int blockId);
 
+	// bg.tu.sofia.entities.Room
 	public Room findByUserId(@Param("userId") int userId);
 }
