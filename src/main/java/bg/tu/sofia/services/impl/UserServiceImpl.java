@@ -52,8 +52,12 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PageUtil pageUtil;
 
-	@Autowired
 	private MailUtil mailUtil;
+
+	@Autowired
+	public void setMailUtil(MailUtil mailUtil) {
+		this.mailUtil = mailUtil;
+	}
 
 	@Autowired
 	private TextHasher textHasher;
@@ -68,6 +72,55 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public StructuredResponse insertUser(UserDto userDto) {
 		// TODO: validation save user, but not userRoom
+		String message = validateUserDto(userDto);
+
+		if (message.length() > 0) {
+			return new StructuredResponse(400, RESPONSE_STATUS.FAIL, null, message);
+		}
+
+		User user = this.toEntity(userDto);
+
+		// if ROLE_HOST has made a request, the role is default
+		// (ROLE_INHABITANT)
+		if (user.getRole().getId() == 0) {
+			user.getRole().setId(1);
+		}
+
+		user = userRepository.save(user);
+
+		Credentials credentials = new Credentials();
+		credentials.setUser(user);
+		String password = textHasher.get_SHA_512_SecurePassword(user.getPersonalNumber(), Constants.SALT);
+		credentials.setPassword(password);
+
+		credentialsRepository.save(credentials);
+
+		userDto.setId(user.getId());
+
+		StructuredResponse response = null;
+
+		switch (user.getRole().getId()) {
+		case 1:
+			response = completeInhabitantInsertion(userDto);
+			break;
+		case 2:
+			response = completeHostInsertion(userDto);
+			break;
+		case 3:
+		case 4:
+			response = completeCashierOrAdministratorInsertion(userDto);
+			break;
+		default:
+			response = new StructuredResponse(500, RESPONSE_STATUS.FAIL, null,
+					"Невалидни данни за записване на потребител");
+			break;
+		}
+
+		return response;
+
+	}
+
+	private String validateUserDto(UserDto userDto) {
 		StringBuilder sb = new StringBuilder();
 
 		if (userDto.getUsername() == null || !userDto.getUsername().matches("[А-Яа-я]+[ ]*[А-Яа-я]*[ ]*[А-Яа-я]*")) {
@@ -96,47 +149,7 @@ public class UserServiceImpl implements UserService {
 			sb.append("Невалиден избор на стая!");
 		}
 
-		if (sb.length() != 0) {
-			return new StructuredResponse(400, RESPONSE_STATUS.FAIL, null, sb.toString());
-		}
-
-		User user = this.toEntity(userDto);
-
-		// if ROLE_HOST has made a request, the role is default
-		// (ROLE_INHABITANT)
-		if (user.getRole().getId() == 0) {
-			user.getRole().setId(1);
-		}
-
-		userRepository.save(user);
-
-		Credentials credentials = new Credentials();
-		credentials.setUser(user);
-		String password = textHasher.get_SHA_512_SecurePassword(user.getPersonalNumber(), Constants.SALT);
-		credentials.setPassword(password);
-
-		credentialsRepository.save(credentials);
-
-		user = userRepository.save(user);
-		userDto.setId(user.getId());
-
-		StructuredResponse response = null;
-
-		switch (user.getRole().getId()) {
-		case 1:
-			response = completeInhabitantInsertion(userDto);
-			break;
-		case 2:
-			response = completeHostInsertion(userDto);
-			break;
-		case 3:
-		case 4:
-			response = completeCashierOrAdministratorInsertion(userDto);
-			break;
-		}
-
-		return response;
-
+		return sb.toString();
 	}
 
 	private StructuredResponse completeInhabitantInsertion(UserDto user) {
@@ -194,24 +207,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDto> getPeopleWithNightTaxes(String blockId, int pageNumber) {
-
-		PageRequest pageable = new PageRequest(pageNumber - 1, PAGE_SIZE);
-
-		Page<User> users;
-		if (blockId != null) {
-			int blockIdInt = Integer.parseInt(blockId);
-
-			users = userRepository.getPageOfPeopleWithTaxesByBlockId(blockIdInt, pageable);
-		} else {
-			users = userRepository.getPageOfPeopleWithTaxes(pageable);
-		}
-		return users.getContent().stream().map(this::fromEntity).collect(Collectors.toList());
-
-	}
-
-	@Override
-	public List<UserDto> getPeopleWithNightTaxesByMarker(String marker, String blockId, int pageNumber) {
+	public List<UserDto> getPeopleWithNightTaxes(String marker, String blockId, int pageNumber) {
 		PageRequest pageable = new PageRequest(pageNumber - 1, PAGE_SIZE);
 
 		Page<User> users = null;
@@ -238,20 +234,30 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String getCountPeopleWithNightTaxes(String blockId, int pageNumber) {
+	public String getPaginationPeopleWithNightTaxes(String marker, String blockId, int pageNumber) {
 
 		PageRequest pageable = new PageRequest(0, PAGE_SIZE);
 
 		int pagesCount;
 
 		if (blockId != null) {
+
 			int blockIdInt = Integer.parseInt(blockId);
 
-			pagesCount = userRepository.getPageOfPeopleWithTaxesByBlockId(blockIdInt, pageable).getTotalPages();
+			if (StringUtils.isBlank(marker)) {
+				pagesCount = userRepository.getPageOfPeopleWithTaxesByBlockId(blockIdInt, pageable).getTotalPages();
+			} else {
+				pagesCount = userRepository.getPageOfPeopleWithTaxesByBlockIdAndMarker("%" + marker + "%", blockIdInt,
+						pageable).getTotalPages();
+			}
 		} else {
-			pagesCount = userRepository.getPageOfPeopleWithTaxes(pageable).getTotalPages();
+			if (StringUtils.isBlank(marker)) {
+				pagesCount = userRepository.getPageOfPeopleWithTaxes(pageable).getTotalPages();
+			} else {
+				pagesCount = userRepository.getPageOfPeopleWithTaxesByMarker("%" + marker + "%", pageable).getTotalPages();
+			}
 		}
-
+		
 		return pageUtil.createPagination(pageNumber, pagesCount);
 	}
 

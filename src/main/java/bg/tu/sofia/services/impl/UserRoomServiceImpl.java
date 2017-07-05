@@ -11,7 +11,7 @@ import bg.tu.sofia.repositories.UserRoomRepository;
 import bg.tu.sofia.services.UserRoomService;
 
 @Component
-public class UserRoomServiceImpl implements UserRoomService{
+public class UserRoomServiceImpl implements UserRoomService {
 	
 	@Autowired
 	private UserRoomRepository userRoomRepository; 

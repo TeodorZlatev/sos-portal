@@ -50,8 +50,12 @@ public class NightTaxServiceImpl implements NightTaxService {
 	@Autowired
 	private PageUtil pageUtil;
 
-	@Autowired
 	private MailUtil mailUtil;
+
+	@Autowired
+	public void setMailUtil(MailUtil mailUtil) {
+		this.mailUtil = mailUtil;
+	}
 
 	@Override
 	public StructuredResponse createNightTax(NightTaxDto nightTaxDto) {

@@ -17,11 +17,9 @@ public interface UserService {
 	
 	public UserDto getPersonWithNightTaxes(int userId);
 	
-	public List<UserDto> getPeopleWithNightTaxes(String blockId, int pageNumber);
+	public List<UserDto> getPeopleWithNightTaxes(String marker, String blockId, int pageNumber);
 	
-	public List<UserDto> getPeopleWithNightTaxesByMarker(String marker, String blockId, int pageNumber);
-	
-	public String getCountPeopleWithNightTaxes(String blockId, int pageNumber);
+	public String getPaginationPeopleWithNightTaxes(String marker, String blockId, int pageNumber);
 	
 	public User authenticateUser(String personalNumber, String password) throws Exception;
 

@@ -16,7 +16,11 @@ import bg.tu.sofia.dtos.BlockDto;
 import bg.tu.sofia.entities.Block;
 import bg.tu.sofia.entities.User;
 import bg.tu.sofia.repositories.BlockRepository;
+import bg.tu.sofia.repositories.CredentialsRepository;
+import bg.tu.sofia.repositories.NightTaxRepository;
+import bg.tu.sofia.repositories.RoomRepository;
 import bg.tu.sofia.repositories.UserRepository;
+import bg.tu.sofia.repositories.UserRoomRepository;
 import bg.tu.sofia.services.BlockService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,11 +41,27 @@ public class BlockServiceTests {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private RoomRepository roomRepository;
+	
+	@Autowired
+	private NightTaxRepository nightTaxRepository;
+	
+	@Autowired
+	private CredentialsRepository credentialsRepository;
+	
+	@Autowired
+	private UserRoomRepository userRoomRepository;
+	
 	@Autowired 
 	private BlockService blockService;
 	
 	@Before
 	public void setup() {
+		nightTaxRepository.deleteAll();
+		credentialsRepository.deleteAll();
+		userRoomRepository.deleteAll();
+		roomRepository.deleteAll();
 		blockRepository.deleteAll();
 		userRepository.deleteAll();
 	}

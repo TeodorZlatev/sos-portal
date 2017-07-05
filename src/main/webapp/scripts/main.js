@@ -194,12 +194,12 @@ function showMessage(responseData) {
 
 // INSERT USER
 function createDivInsertUserByAdmin() {
-	document.title = "Записване на потребител";
+	document.title = "Вписване на потребител";
 
 	var mainDiv = document.getElementById("mainDiv");
 	mainDiv.innerHTML = "";
 
-	createElement(mainDiv, "h1", "Записване на потребител");
+	createElement(mainDiv, "h1", "Вписване на потребител");
 
 	var table = createElement(mainDiv, "table", null, null, [ {
 		name : "id",
@@ -727,7 +727,7 @@ function createNightTax() {
 		"roomId" : roomId,
 		"hostId" : host,
 		"date" : date,
-		"creatorId": creatorId
+		"creatorId" : creatorId
 	});
 
 	requestHeader = [ {
@@ -874,39 +874,53 @@ function fetchPeopleWithNightTaxes(blockId, userId, pageNumber) {
 			} else {
 				fillInPeopleTable(people);
 
-				fetchPeopleWithNightTaxesAboutPagination(blockId, pageNumber);
+				fetchPeopleWithNightTaxesAboutPagination(null, blockId,
+						pageNumber);
 			}
 
 		}, "GET", "/sos-portal/api/usersNightTaxes?blockId=" + blockId
 				+ "&pageNumber=" + pageNumber);
 	} else {
-		createAjaxRequest(function(responseText) {
-			var people = JSON.parse(responseText);
+		createAjaxRequest(
+				function(responseText) {
+					var people = JSON.parse(responseText);
 
-			if (people.length === 0) {
+					if (people.length === 0) {
 
-				showNoAvailable();
+						showNoAvailable();
 
-			} else {
-				fillInPeopleTable(people);
+					} else {
+						fillInPeopleTable(people);
 
-				fetchPeopleWithNightTaxesAboutPagination(null, pageNumber);
-			}
+						fetchPeopleWithNightTaxesAboutPagination(null, null,
+								pageNumber);
+					}
 
-		}, "GET", "/sos-portal/api/usersNightTaxes?pageNumber=" + pageNumber);
+				}, "GET", "/sos-portal/api/usersNightTaxes?pageNumber="
+						+ pageNumber);
 	}
 
 }
 
-function fetchPeopleWithNightTaxesAboutPagination(blockId, pageNumber) {
+function fetchPeopleWithNightTaxesAboutPagination(marker, blockId, pageNumber) {
 
 	var url;
 
 	if (blockId) {
-		url = "/sos-portal/api/usersNightTaxesCount?blockId=" + blockId
-				+ "&pageNumber=" + pageNumber;
+		if (marker) {
+			url = "/sos-portal/api/usersNightTaxes/pagination?marker=" + marker
+					+ "&blockId=" + blockId + "&pageNumber=" + pageNumber;
+		} else {
+			url = "/sos-portal/api/usersNightTaxes/pagination?blockId=" + blockId
+					+ "&pageNumber=" + pageNumber;
+		}
 	} else {
-		url = "/sos-portal/api/usersNightTaxesCount?pageNumber=" + pageNumber;
+		if (marker) {
+			url = "/sos-portal/api/usersNightTaxes/pagination?marker=" + marker
+					+ "&pageNumber=" + pageNumber;
+		} else {
+			url = "/sos-portal/api/usersNightTaxes/pagination?pageNumber=" + pageNumber;
+		}
 	}
 
 	createAjaxRequest(function(responseText) {
@@ -1089,7 +1103,7 @@ function searchPeople() {
 
 					fillInPeopleTable(people);
 
-					fetchPeopleWithNightTaxesAboutPagination(blockId, 1);
+					fetchPeopleWithNightTaxesAboutPagination(marker, blockId, 1);
 				}
 			}, "GET", url);
 }
@@ -1413,7 +1427,6 @@ function payNightTaxes(userId) {
 	}
 
 	var data = JSON.stringify(ids);
-	console.log(data);
 
 	requestHeader = [ {
 		header : "Accept",

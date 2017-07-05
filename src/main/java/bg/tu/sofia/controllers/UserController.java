@@ -55,16 +55,16 @@ public class UserController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('HOST','CASHIER','ADMINISTRATOR')")
 	public List<UserDto> getPeopleWithNightTaxes(@RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
-		return userService.getPeopleWithNightTaxes(blockId, pageNumber);
+		return userService.getPeopleWithNightTaxes(null, blockId, pageNumber);
 	}
 	
 	@RequestMapping(
 			method = RequestMethod.GET,
-			value = "/api/usersNightTaxesCount",
+			value = "/api/usersNightTaxes/pagination",
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('HOST','CASHIER','ADMINISTRATOR')")
-	public String getPeopleWithNightTaxesCount(@RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
-		return userService.getCountPeopleWithNightTaxes(blockId, pageNumber);
+	public String getPaginationPeopleWithNightTaxes(@RequestParam(required = false) String marker, @RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
+		return userService.getPaginationPeopleWithNightTaxes(marker, blockId, pageNumber);
 	}
 	
 	@RequestMapping(
@@ -73,6 +73,6 @@ public class UserController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('HOST','CASHIER','ADMINISTRATOR')")
 	public List<UserDto> searchByMarker(@RequestParam String marker, @RequestParam(required = false) String blockId, @RequestParam int pageNumber) {
-		return userService.getPeopleWithNightTaxesByMarker(marker, blockId, pageNumber);
+		return userService.getPeopleWithNightTaxes(marker, blockId, pageNumber);
 	}
 }
